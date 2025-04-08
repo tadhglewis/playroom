@@ -135,7 +135,8 @@ ${code}
     setMessages,
     error: chatError,
   } = useChat({
-    api: 'http://localhost:8080/api/chat',
+    api: 'https://indie-turtle.ssod.skinfra.xyz/_s2s/api/chat',
+    headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
     onFinish: (message) => {
       dispatch({
@@ -282,7 +283,10 @@ ${code}
             </Stack>
             {loading ? (
               <Box paddingX="large">
-                <Text>{loadingMessage}</Text>
+                <Text>
+                  <span className={styles.turtle}>🐢</span>
+                  {loadingMessage}
+                </Text>
               </Box>
             ) : null}
 

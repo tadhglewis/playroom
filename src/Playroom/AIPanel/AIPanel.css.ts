@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { keyframes, style } from '@vanilla-extract/css';
 import { sprinkles, colorPaletteVars } from '../sprinkles.css';
 import { vars } from '../vars.css';
 import { calc } from '@vanilla-extract/css-utils';
@@ -169,3 +169,21 @@ export const attachmentImage = style([
     objectFit: 'contain',
   },
 ]);
+
+const spinAndPulse = keyframes({
+  '0%': {
+    transform: 'rotate(0deg) scale(1)',
+  },
+  '50%': {
+    transform: 'rotate(180deg) scale(1.5)',
+  },
+  '100%': {
+    transform: 'rotate(360deg) scale(1)',
+  },
+});
+
+export const turtle = style({
+  display: 'inline-block',
+  animation: `${spinAndPulse} 1.5s ease-in-out infinite`,
+  marginRight: 10,
+});
