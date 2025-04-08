@@ -12,7 +12,6 @@ export const reset = style([
     appearance: 'none',
     userSelect: 'none',
     position: 'relative',
-    cursor: 'pointer',
     display: 'flex',
     placeItems: 'center',
   }),
@@ -43,15 +42,6 @@ export const base = style([
     color: highlightColor,
     border: `1px solid ${colorPaletteVars.foreground.neutralSoft}`,
     height: calc(vars.grid).multiply(9).toString(),
-    ':hover': {
-      vars: {
-        [highlightColor]: colorPaletteVars.foreground.accent,
-      },
-      borderColor: highlightColor,
-    },
-    ':active': {
-      transform: 'scale(0.98)',
-    },
     '::after': {
       content: '',
       position: 'absolute',
@@ -64,9 +54,26 @@ export const base = style([
       top: '50%',
     },
     selectors: {
-      [`&:focus:not(:active):not(:hover):not([disabled])`]: {
-        boxShadow: colorPaletteVars.shadows.focus,
+      [`&:disabled`]: {
+        opacity: 0.6,
       },
+      [`&:not(:disabled)`]: {
+        cursor: 'pointer',
+      },
+      [`&:hover:not(:disabled), &:focus-visible:not(:disabled), &:has(:focus-visible)`]:
+        {
+          vars: {
+            [highlightColor]: colorPaletteVars.foreground.accent,
+          },
+          borderColor: highlightColor,
+        },
+      [`&:active:not(:disabled)`]: {
+        transform: 'scale(0.98)',
+      },
+      [`&:focus:not(:active):not(:hover):not([disabled]), &:has(:focus-visible)`]:
+        {
+          boxShadow: colorPaletteVars.shadows.focus,
+        },
     },
   },
 ]);

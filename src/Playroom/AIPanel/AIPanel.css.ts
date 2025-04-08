@@ -1,192 +1,171 @@
-import { style, keyframes } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { sprinkles, colorPaletteVars } from '../sprinkles.css';
 import { vars } from '../vars.css';
+import { calc } from '@vanilla-extract/css-utils';
 
-export const field = style({
-  width: '100%',
+const fieldVerticalPadding = 'xlarge';
+
+export const root = sprinkles({
+  position: 'relative',
+  width: 'full',
+  height: 'full',
 });
 
-export const input = style([
+export const fieldContainer = style([
   sprinkles({
-    display: 'block',
-    width: 'full',
-    padding: 'small',
-    borderRadius: 'small',
+    position: 'relative',
+    paddingX: 'small',
+    paddingBottom: fieldVerticalPadding,
   }),
   {
-    backgroundColor: colorPaletteVars.background.surface,
-    border: `1px solid ${colorPaletteVars.foreground.neutral}`,
-    fontFamily: 'inherit',
-    fontSize: '0.9em',
+    borderTop: `1px solid ${colorPaletteVars.border.standard}`,
   },
 ]);
 
 export const textarea = style([
-  input,
-  {
-    resize: 'vertical',
-    minHeight: '100px',
-  },
-]);
-
-export const aiOutput = style([
-  sprinkles({
-    padding: 'medium',
-    borderRadius: 'small',
-  }),
-  {
-    backgroundColor: colorPaletteVars.background.selection,
-    fontFamily: 'monospace',
-    whiteSpace: 'pre-wrap',
-    overflowWrap: 'break-word',
-  },
-]);
-
-export const status = style([
-  sprinkles({
-    padding: 'xsmall',
-  }),
-]);
-
-export const outputCode = style({
-  fontFamily: 'monospace',
-  whiteSpace: 'pre-wrap',
-  overflowWrap: 'break-word',
-});
-
-export const conversationContainer = style([
-  sprinkles({
-    borderRadius: 'small',
-    padding: 'medium',
-  }),
-  {
-    backgroundColor: colorPaletteVars.background.surface,
-    border: `1px solid ${colorPaletteVars.border.standard}`,
-  },
-]);
-
-export const messageContainer = style([
-  sprinkles({
-    padding: 'small',
-    marginBottom: 'small',
-    borderRadius: 'small',
-  }),
-]);
-
-export const userMessage = style({
-  backgroundColor: colorPaletteVars.background.neutral,
-});
-
-export const assistantMessage = style({
-  backgroundColor: colorPaletteVars.background.positive,
-});
-
-export const textField = style([
   sprinkles({
     font: 'large',
     width: 'full',
     paddingX: 'large',
+    paddingY: fieldVerticalPadding,
     boxSizing: 'border-box',
     borderRadius: 'medium',
   }),
   {
+    resize: 'none',
+    outline: 'none',
+    border: 'none',
     color: colorPaletteVars.foreground.neutral,
-    height: vars.touchableSize,
     background: colorPaletteVars.background.surface,
     '::placeholder': {
       color: colorPaletteVars.foreground.neutralSoft,
     },
-    border: `1px solid ${colorPaletteVars.border.standard}`,
     minHeight: 100,
   },
 ]);
 
-export const textArea = style([
-  sprinkles({
-    font: 'large',
-    width: 'full',
-    paddingX: 'large',
-    boxSizing: 'border-box',
-    borderRadius: 'medium',
-  }),
-  {
-    padding: 10,
-    color: colorPaletteVars.foreground.neutral,
-    height: 100,
-    background: colorPaletteVars.background.surface,
-    '::placeholder': {
-      color: colorPaletteVars.foreground.neutralSoft,
-    },
-    border: `1px solid ${colorPaletteVars.border.standard}`,
-  },
-]);
-
-const spinAndPulse = keyframes({
-  '0%': {
-    transform: 'rotate(0deg) scale(1)',
-  },
-  '50%': {
-    transform: 'rotate(180deg) scale(1.5)',
-  },
-  '100%': {
-    transform: 'rotate(360deg) scale(1)',
-  },
-});
-
-export const spinningAnimation = style({
-  display: 'inline-block',
-  animation: `${spinAndPulse} 1.5s ease-in-out infinite`,
-});
-
-export const imageUploadContainer = style([
-  sprinkles({
-    // display: 'flex',
-    // alignItems: 'center',
-    // gap: 'small',
-  }),
-]);
-
-export const imageInput = style({
+export const focusIndicator = style({
   position: 'absolute',
-  width: '0.1px',
-  height: '0.1px',
-  opacity: 0,
-  overflow: 'hidden',
-  zIndex: -1,
-});
-
-export const imageInputLabel = style([
-  sprinkles({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingX: 'medium',
-    borderRadius: 'medium',
-    cursor: 'pointer',
-    fontWeight: 'strong',
-  }),
-  {
-    backgroundColor: colorPaletteVars.background.neutral,
-    color: colorPaletteVars.foreground.neutral,
-    height: vars.touchableSize,
-    transition: 'background-color 0.2s ease',
-    ':hover': {
-      backgroundColor: colorPaletteVars.background.neutral,
+  top: 0,
+  left: 0,
+  right: 0,
+  height: '2px',
+  backgroundColor: colorPaletteVars.foreground.accent,
+  transition: vars.transition.fast,
+  selectors: {
+    [`${textarea}:not(:focus-visible) ~ &`]: {
+      opacity: 0,
+      transform: 'translateY(-3px) scaleX(.75)',
     },
   },
+});
+
+export const message = style([
+  sprinkles({
+    padding: 'large',
+  }),
+  {
+    borderRadius: '12px', // xlarge
+    width: 'fit-content',
+  },
+]);
+
+export const groupMessageBlock = style({
+  marginTop: calc(vars.space.medium).negate().toString(),
+  borderTopRightRadius: 0,
+});
+
+const messagesEndBufferSize = 'xxlarge';
+export const messageContainer = style([
+  sprinkles({
+    paddingX: 'medium',
+    paddingBottom: messagesEndBufferSize,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    gap: 'xlarge',
+  }),
+  {
+    minHeight: calc('100%')
+      .subtract(vars.space[messagesEndBufferSize])
+      .toString(),
+  },
+]);
+
+export const userMessage = style({
+  backgroundColor: colorPaletteVars.background.selection,
+  marginLeft: vars.space.xxlarge,
+  borderBottomRightRadius: 0,
+  alignSelf: 'flex-end',
+});
+
+export const assistantMessage = style({
+  border: `1px solid ${colorPaletteVars.border.standard}`,
+  borderBottomLeftRadius: 0,
+  marginRight: vars.space.xxlarge,
+  alignSelf: 'flex-start',
+});
+
+export const imageInput = style([
+  sprinkles({
+    position: 'absolute',
+    pointerEvents: 'none',
+    opacity: 0,
+    bottom: 0,
+    overflow: 'hidden',
+    height: 'full',
+    width: 'full',
+  }),
 ]);
 
 export const imageAttachment = style([
   sprinkles({
-    marginTop: 'small',
-    borderRadius: 'small',
-    overflow: 'hidden',
+    position: 'relative',
+    borderRadius: 'medium',
   }),
+  {
+    width: 'fit-content',
+  },
 ]);
 
-export const attachmentImage = style({
-  maxWidth: '100%',
-  height: 'auto',
-  maxHeight: '200px',
-  objectFit: 'contain',
-});
+export const clearImage = style([
+  sprinkles({
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    borderRadius: 'full',
+    padding: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }),
+  {
+    appearance: 'none',
+    background: colorPaletteVars.background.surface,
+    border: `1px solid ${colorPaletteVars.border.standard}`,
+    height: '24px',
+    width: '24px',
+    transform: 'translate(50%, -50%)',
+    '::before': {
+      content: '',
+      position: 'absolute',
+      height: 44,
+      width: 44,
+      flexShrink: 0,
+    },
+  },
+]);
+
+export const attachmentImage = style([
+  sprinkles({
+    display: 'block',
+    borderRadius: 'large',
+  }),
+  {
+    maxHeight: '70px',
+    height: 'auto',
+    maxWidth: '70px',
+    objectFit: 'contain',
+  },
+]);

@@ -10,22 +10,12 @@ import { Box } from '../Box/Box';
 import type { PlayroomProps } from '../Playroom';
 
 import * as styles from './FramesPanel.css';
+import { TextLinkButton } from '../TextLinkButton/TextLinkButton';
 
 interface FramesPanelProps {
   availableWidths: PlayroomProps['widths'];
   availableThemes: string[];
 }
-
-interface ResetButtonProps {
-  onClick: () => void;
-  children: ReactNode;
-}
-
-const ResetButton = ({ onClick, children }: ResetButtonProps) => (
-  <button className={styles.reset} onClick={onClick}>
-    {children}
-  </button>
-);
 
 interface FrameHeadingProps {
   showReset: boolean;
@@ -37,7 +27,7 @@ const FrameHeading = ({ showReset, onReset, children }: FrameHeadingProps) => (
     <Box flexGrow={1}>
       <Heading level="3">{children}</Heading>
     </Box>
-    {showReset && <ResetButton onClick={onReset}>Clear</ResetButton>}
+    {showReset && <TextLinkButton onClick={onReset}>Clear</TextLinkButton>}
   </Inline>
 );
 
