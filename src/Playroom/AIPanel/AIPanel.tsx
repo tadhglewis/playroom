@@ -40,6 +40,37 @@ const loadingMessages = [
   'Contemplating...',
 ];
 
+const pxToInt = (str: string | null) =>
+  typeof str === 'string' ? parseInt(str.replace('px', ''), 10) : 0;
+
+const calculateLines = (
+  target: HTMLTextAreaElement,
+  lines: number,
+  lineLimit?: number
+) => {
+  const { paddingBottom, paddingTop, lineHeight } =
+    window.getComputedStyle(target);
+
+  // If line height is not a pixel value (e.g. 'normal' or unitless),
+  // bail out of grow behaviour as we cannot calculate accurately.
+  if (!lineHeight.endsWith('px')) {
+    return lines;
+  }
+
+  const padding = pxToInt(paddingTop) + pxToInt(paddingBottom);
+  const currentRows = Math.floor(
+    (target.scrollHeight - padding) / pxToInt(lineHeight)
+  );
+
+  if (target && target.value === '') {
+    return lines;
+  }
+
+  return typeof lineLimit === 'number' && currentRows > lineLimit
+    ? lineLimit
+    : currentRows;
+};
+
 export default ({
   snippets,
   components,
@@ -50,6 +81,7 @@ export default ({
   const [state, dispatch] = useContext(StoreContext);
   const [error, setError] = useState('');
   const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [textareaRows, setTextareaRows] = useState(2);
   const [loadingMessage, setLoadingMessage] = useState('Generating...');
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -332,91 +364,91 @@ ${code}
                         )}
                       </Box>
                       {!loading && hasPreviewCode ? (
-                          <Inline space="medium" alignY="center">
-                            {jsxVariations.length > 1 ? (
-                              <>
-                                <Button
-                                  aria-label="Previous suggestion"
-                                  title="Previous suggestion"
-                                  variant="transparent"
-                                  disabled={suggestionIndex === 0}
-                                  onClick={() => {
-                                    const newIndex = suggestionIndex - 1;
-                                    setSuggestionIndex(newIndex);
-                                    dispatch({
-                                      type: 'previewSnippet',
-                                      payload: {
-                                        snippet: {
-                                          group: '',
-                                          name: '',
-                                          code: jsxVariations[newIndex],
-                                        },
+                        <Inline space="medium" alignY="center">
+                          {jsxVariations.length > 1 ? (
+                            <>
+                              <Button
+                                aria-label="Previous suggestion"
+                                title="Previous suggestion"
+                                variant="transparent"
+                                disabled={suggestionIndex === 0}
+                                onClick={() => {
+                                  const newIndex = suggestionIndex - 1;
+                                  setSuggestionIndex(newIndex);
+                                  dispatch({
+                                    type: 'previewSnippet',
+                                    payload: {
+                                      snippet: {
+                                        group: '',
+                                        name: '',
+                                        code: jsxVariations[newIndex],
                                       },
-                                    });
-                                  }}
-                                >
-                                  <ChevronIcon direction="left" size={16} />
-                                </Button>
+                                    },
+                                  });
+                                }}
+                              >
+                                <ChevronIcon direction="left" size={16} />
+                              </Button>
                               <Text size="small">{`${suggestionIndex + 1} of ${
                                 jsxVariations.length
                               }`}</Text>
-                                <Button
-                                  aria-label="Next suggestion"
-                                  title="Next suggestion"
-                                  variant="transparent"
-                                  disabled={
-                                    suggestionIndex === jsxVariations.length - 1
-                                  }
-                                  onClick={() => {
-                                    const newIndex = suggestionIndex + 1;
-                                    setSuggestionIndex(newIndex);
-                                    dispatch({
-                                      type: 'previewSnippet',
-                                      payload: {
-                                        snippet: {
-                                          group: '',
-                                          name: '',
-                                          code: jsxVariations[newIndex],
-                                        },
+                              <Button
+                                aria-label="Next suggestion"
+                                title="Next suggestion"
+                                variant="transparent"
+                                disabled={
+                                  suggestionIndex === jsxVariations.length - 1
+                                }
+                                onClick={() => {
+                                  const newIndex = suggestionIndex + 1;
+                                  setSuggestionIndex(newIndex);
+                                  dispatch({
+                                    type: 'previewSnippet',
+                                    payload: {
+                                      snippet: {
+                                        group: '',
+                                        name: '',
+                                        code: jsxVariations[newIndex],
                                       },
-                                    });
-                                  }}
-                                >
-                                  <ChevronIcon direction="right" size={16} />
-                                </Button>
-                              </>
-                            ) : null}
-                            <Button
-                              aria-label={copying ? 'Copied' : 'Copy code'}
-                              title={copying ? 'Copied' : 'Copy code'}
-                              variant="transparent"
-                              tone={copying ? 'positive' : undefined}
-                              onClick={() =>
-                                copyClick(jsxVariations[suggestionIndex])
-                              }
-                            >
-                              {copying ? (
-                                <TickIcon size={16} />
-                              ) : (
-                                <CopyIcon size={16} />
-                              )}
-                            </Button>
-                            <Button
-                              aria-label="Apply code"
-                              title="Apply code"
-                              variant="transparent"
-                              onClick={() =>
-                                dispatch({
-                                  type: 'updateCode',
-                                  payload: {
-                                    code: jsxVariations[suggestionIndex],
-                                  },
-                                })
-                              }
-                            >
-                              <AddIcon size={16} />
-                            </Button>
-                          </Inline>
+                                    },
+                                  });
+                                }}
+                              >
+                                <ChevronIcon direction="right" size={16} />
+                              </Button>
+                            </>
+                          ) : null}
+                          <Button
+                            aria-label={copying ? 'Copied' : 'Copy code'}
+                            title={copying ? 'Copied' : 'Copy code'}
+                            variant="transparent"
+                            tone={copying ? 'positive' : undefined}
+                            onClick={() =>
+                              copyClick(jsxVariations[suggestionIndex])
+                            }
+                          >
+                            {copying ? (
+                              <TickIcon size={16} />
+                            ) : (
+                              <CopyIcon size={16} />
+                            )}
+                          </Button>
+                          <Button
+                            aria-label="Apply code"
+                            title="Apply code"
+                            variant="transparent"
+                            onClick={() =>
+                              dispatch({
+                                type: 'updateCode',
+                                payload: {
+                                  code: jsxVariations[suggestionIndex],
+                                },
+                              })
+                            }
+                          >
+                            <AddIcon size={16} />
+                          </Button>
+                        </Inline>
                       ) : null}
                     </Stack>
                   );
@@ -425,9 +457,9 @@ ${code}
             {loading ? <Text>{loadingMessage}</Text> : null}
 
             {hasError ? (
-                <Text tone="critical">
-                  {error || chatError?.message || 'An error occurred'}
-                </Text>
+              <Text tone="critical">
+                {error || chatError?.message || 'An error occurred'}
+              </Text>
             ) : null}
           </Box>
         </ScrollContainer>
@@ -476,7 +508,13 @@ ${code}
                 ref={textareaRef}
                 className={styles.textarea}
                 value={input}
-                onChange={handleInputChange}
+                rows={textareaRows}
+                onChange={(ev) => {
+                  setTextareaRows(
+                    calculateLines(ev.currentTarget, textareaRows, 5)
+                  );
+                  handleInputChange(ev);
+                }}
                 autoFocus
                 placeholder={
                   state.code

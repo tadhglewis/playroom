@@ -40,7 +40,6 @@ export const textarea = style([
     '::placeholder': {
       color: colorPaletteVars.foreground.neutralSoft,
     },
-    minHeight: 100,
   },
 ]);
 
