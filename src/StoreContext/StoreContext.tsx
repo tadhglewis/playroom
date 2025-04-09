@@ -12,7 +12,11 @@ import dedent from 'dedent';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { type Snippet, compressParams } from '../../utils';
-import { formatForInsertion, formatAndInsert } from '../utils/formatting';
+import {
+  formatForInsertion,
+  formatAndInsert,
+  formatCode,
+} from '../utils/formatting';
 import { getParamsFromQuery, updateUrlCode } from '../utils/params';
 import type { PlayroomProps } from '../Playroom/Playroom';
 import { isValidLocation } from '../utils/cursor';
@@ -108,6 +112,7 @@ type Action =
     }
   | { type: 'persistSnippet'; payload: { snippet: Snippet } }
   | { type: 'previewSnippet'; payload: { snippet: Snippet | null } }
+  | { type: 'previewSuggestion'; payload: { code: string } }
   | { type: 'toggleToolbar'; payload: { panel: ToolbarPanel } }
   | { type: 'closeToolbar' }
   | { type: 'hideEditor' }
@@ -238,6 +243,22 @@ const createReducer =
               code: state.code,
               snippet: snippet.code,
               cursor: state.cursorPosition,
+            }).code
+          : undefined;
+
+        return {
+          ...state,
+          previewRenderCode,
+        };
+      }
+
+      case 'previewSuggestion': {
+        const { code } = action.payload;
+
+        const previewRenderCode = code
+          ? formatCode({
+              code,
+              cursor: { line: 1, ch: 0 },
             }).code
           : undefined;
 

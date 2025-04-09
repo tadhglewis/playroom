@@ -26,6 +26,7 @@ import AddIcon from '../icons/AddIcon';
 import { useCopy } from '../../utils/useCopy';
 import TickIcon from '../icons/TickIcon';
 import ChevronIcon from '../icons/ChevronIcon';
+import PlayIcon from '../icons/PlayIcon';
 
 const loadingMessages = [
   'Pondering...',
@@ -80,6 +81,7 @@ export default ({
 }) => {
   const [state, dispatch] = useContext(StoreContext);
   const [error, setError] = useState('');
+  const [previewId, setPreviewId] = useState('');
   const [suggestionIndex, setSuggestionIndex] = useState(0);
   const [textareaRows, setTextareaRows] = useState(2);
   const [loadingMessage, setLoadingMessage] = useState('Generating...');
@@ -204,14 +206,12 @@ ${code}
     onFinish: (message) => {
       const parsedMessage = parseResponse(message.content);
       if (message.role === 'assistant' && parsedMessage) {
+        setSuggestionIndex(0);
+        setPreviewId(message.id);
         dispatch({
-          type: 'previewSnippet',
+          type: 'previewSuggestion',
           payload: {
-            snippet: {
-              group: '',
-              name: '',
-              code: parsedMessage.jsxVariations[0],
-            },
+            code: parsedMessage.jsxVariations[0],
           },
         });
       }
@@ -363,9 +363,9 @@ ${code}
                           </>
                         )}
                       </Box>
-                      {!loading && hasPreviewCode ? (
+                      {hasPreviewCode ? (
                         <Inline space="medium" alignY="center">
-                          {jsxVariations.length > 1 ? (
+                          {msg.id === previewId && jsxVariations.length > 1 ? (
                             <>
                               <Button
                                 aria-label="Previous suggestion"
@@ -376,13 +376,9 @@ ${code}
                                   const newIndex = suggestionIndex - 1;
                                   setSuggestionIndex(newIndex);
                                   dispatch({
-                                    type: 'previewSnippet',
+                                    type: 'previewSuggestion',
                                     payload: {
-                                      snippet: {
-                                        group: '',
-                                        name: '',
-                                        code: jsxVariations[newIndex],
-                                      },
+                                      code: jsxVariations[newIndex],
                                     },
                                   });
                                 }}
@@ -403,13 +399,9 @@ ${code}
                                   const newIndex = suggestionIndex + 1;
                                   setSuggestionIndex(newIndex);
                                   dispatch({
-                                    type: 'previewSnippet',
+                                    type: 'previewSuggestion',
                                     payload: {
-                                      snippet: {
-                                        group: '',
-                                        name: '',
-                                        code: jsxVariations[newIndex],
-                                      },
+                                      code: jsxVariations[newIndex],
                                     },
                                   });
                                 }}
@@ -417,6 +409,25 @@ ${code}
                                 <ChevronIcon direction="right" size={16} />
                               </Button>
                             </>
+                          ) : null}
+                          {msg.id !== previewId ? (
+                            <Button
+                              aria-label="Preview suggestion"
+                              title="Preview suggestion"
+                              variant="transparent"
+                              onClick={() => {
+                                setPreviewId(msg.id);
+                                setSuggestionIndex(0);
+                                dispatch({
+                                  type: 'previewSuggestion',
+                                  payload: {
+                                    code: jsxVariations[0],
+                                  },
+                                });
+                              }}
+                            >
+                              <PlayIcon size={16} />
+                            </Button>
                           ) : null}
                           <Button
                             aria-label={copying ? 'Copied' : 'Copy code'}
@@ -437,14 +448,16 @@ ${code}
                             aria-label="Apply code"
                             title="Apply code"
                             variant="transparent"
-                            onClick={() =>
+                            onClick={() => {
+                              setSuggestionIndex(0);
+                              setPreviewId('');
                               dispatch({
                                 type: 'updateCode',
                                 payload: {
                                   code: jsxVariations[suggestionIndex],
                                 },
-                              })
-                            }
+                              });
+                            }}
                           >
                             <AddIcon size={16} />
                           </Button>
@@ -470,6 +483,7 @@ ${code}
           onSubmit={(e) => {
             setError('');
             setSuggestionIndex(0);
+            setPreviewId('');
             handleSubmit(e, { experimental_attachments: getImageAttachment() });
             clearImageInput();
             textareaRef.current?.focus();
