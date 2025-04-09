@@ -481,12 +481,14 @@ ${code}
           component="form"
           flexGrow={0}
           onSubmit={(e) => {
+            if (!loading) {
             setError('');
             setSuggestionIndex(0);
             setPreviewId('');
             handleSubmit(e, { experimental_attachments: getImageAttachment() });
             clearImageInput();
             textareaRef.current?.focus();
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
