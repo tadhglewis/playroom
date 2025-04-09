@@ -96,12 +96,20 @@ export const variants = {
   ]),
 };
 
-export const positive = style({
-  vars: {
-    [highlightColor]: `${colorPaletteVars.foreground.positive} !important`,
-  },
-  borderColor: highlightColor,
-});
+export const tone = {
+  positive: style({
+    vars: {
+      [highlightColor]: `${colorPaletteVars.foreground.positive} !important`,
+    },
+    borderColor: highlightColor,
+  }),
+  accent: style({
+    vars: {
+      [highlightColor]: `${colorPaletteVars.foreground.accent} !important`,
+    },
+    borderColor: highlightColor,
+  }),
+};
 
 export const iconContainer = style([
   sprinkles({ position: 'relative', paddingLeft: 'small' }),

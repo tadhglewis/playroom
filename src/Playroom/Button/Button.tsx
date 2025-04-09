@@ -5,7 +5,7 @@ import * as styles from './Button.css';
 
 interface BaseProps {
   as?: ElementType;
-  tone?: 'positive';
+  tone?: 'positive' | 'accent';
   variant?: keyof typeof styles.variants;
   icon?: ReactElement;
 }
@@ -34,8 +34,8 @@ export const Button = ({
       styles.reset,
       styles.base,
       styles.variants[variant!],
+      styles.tone[tone!],
       {
-        [styles.positive]: tone === 'positive',
         [styles.disabled]: disabled,
       }
     )}

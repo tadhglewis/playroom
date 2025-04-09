@@ -576,6 +576,9 @@ ${code}
                   <Button
                     type="submit"
                     disabled={input.trim().length === 0}
+                    tone={
+                      input.trim().length > 0 || loading ? 'accent' : undefined
+                    }
                     aria-label={
                       input.trim().length === 0
                         ? 'Enter a prompt to generate UI'
