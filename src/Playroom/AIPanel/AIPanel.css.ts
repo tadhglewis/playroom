@@ -51,6 +51,7 @@ export const focusIndicator = style({
   height: '2px',
   backgroundColor: colorPaletteVars.foreground.accent,
   transition: vars.transition.fast,
+  transformOrigin: '50% 50%',
   selectors: {
     [`${textarea}:not(:focus-visible) ~ &`]: {
       opacity: 0,
