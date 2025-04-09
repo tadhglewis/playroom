@@ -334,9 +334,7 @@ message must contain the follow-up message to the end user.
                     )
                 )
                 .map((msg, index) => {
-                  const { message, ...rest } = parseResponse(msg.content) ?? {
-                    jsx: '',
-                  };
+                  const { message, ...rest } = parseResponse(msg.content) ?? {};
 
                   const jsxVariations = Object.values(rest);
 
