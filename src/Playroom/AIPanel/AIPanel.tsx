@@ -108,6 +108,94 @@ ${code}
 `
 )}
 
+\`\`\`jsx
+<Stack space="medium">
+  <Checkbox label="Checkbox" stateName="myCheckbox" />
+
+  {getState("myCheckbox") && (
+    <Notice tone="positive">
+      <Text>Good job! You checked the checkbox!</Text>
+    </Notice>
+  )}
+</Stack>
+\`\`\`
+
+\`\`\`jsx
+<Stack space="medium">
+  <Checkbox label="Checkbox" stateName="myCheckbox" />
+
+  {getState("myCheckbox") ? (
+    <Notice tone="positive">
+      <Text>Good job! You checked the checkbox!</Text>
+    </Notice>
+  ) : (
+    <Notice tone="critical">
+      <Text>Oops! You haven’t checked the checkbox!</Text>
+    </Notice>
+  )}
+</Stack>
+\`\`\`
+
+\`\`\`jsx
+{setDefaultState("myCheckbox", true)}
+
+<Stack space="medium">
+  <Checkbox label="Checkbox" stateName="myCheckbox" />
+
+  {getState("myCheckbox") ? (
+    <Notice tone="positive">
+      <Text>Good job! You checked the checkbox!</Text>
+    </Notice>
+  ) : (
+    <Notice tone="critical">
+      <Text>Oops! You haven’t checked the checkbox!</Text>
+    </Notice>
+  )}
+</Stack>
+\`\`\`
+
+\`\`\`jsx
+<Card>
+  <Stack space="large">
+    <TextField label="First name" stateName="firstName" />
+    <TextField label="Last name" stateName="lastName" />
+
+    {getState("firstName") && getState("lastName") ? (
+      <Heading level="4">
+        👋 Hello {getState("firstName")} {getState("lastName")}!
+      </Heading>
+    ) : null}
+  </Stack>
+</Card>
+\`\`\`
+
+\`\`\`jsx
+{setDefaultState("screen", "Home")}
+
+{getState("screen") === "Home" && (
+  <Card>
+    <Stack space="large">
+      <Heading level="3">Home</Heading>
+      <Actions>
+        <Button onClick={() => setState("screen", "Welcome")}>Sign in</Button>
+      </Actions>
+    </Stack>
+  </Card>
+)}
+
+{getState("screen") === "Welcome" && (
+  <Card>
+    <Stack space="large">
+      <Heading level="3">👋 Welcome!</Heading>
+      <Placeholder height={100} />
+      <Actions>
+        <Button onClick={() => resetState("screen")}>Sign out</Button>
+      </Actions>
+    </Stack>
+  </Card>
+)}
+\`\`\`
+
 ## Instructions
 
 1. Create concise, elegant layouts using ONLY the components listed above.

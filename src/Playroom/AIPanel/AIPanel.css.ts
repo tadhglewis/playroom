@@ -81,6 +81,7 @@ export const message = style([
   {
     borderRadius: '12px', // xlarge
     width: 'fit-content',
+    whiteSpace: 'pre-line',
   },
 ]);
 
