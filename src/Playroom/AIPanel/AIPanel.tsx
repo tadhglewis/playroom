@@ -158,6 +158,8 @@ Return a JSON object in the following format:
 1 must contain valid JSX. No explanations, no markdown, no code blocks (.e.g \`\`\`JSX). The code will be directly rendered in the UI. Ensure all opening tags have matching closing tags.
 2 to 9 are optional and can be used to provide alternative suggestions. If you have multiple suggestions, return them in the order of preference.
 message must contain the follow-up message to the end user.
+
+Generate and return only 1 unless specifically asked to generate multiple versions, options, or variants.
 `;
 
   const preprompt: Message[] = [
@@ -335,7 +337,7 @@ message must contain the follow-up message to the end user.
                 )
                 .map((msg, index) => {
                   const { message, ...rest } = parseResponse(msg.content) ?? {
-                    jsx: '',
+                    message: '',
                   };
 
                   const jsxVariations = Object.values(rest);
