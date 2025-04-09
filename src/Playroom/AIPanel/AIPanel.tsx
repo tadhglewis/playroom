@@ -25,6 +25,7 @@ import DismissIcon from '../icons/DismissIcon';
 import AddIcon from '../icons/AddIcon';
 import { useCopy } from '../../utils/useCopy';
 import TickIcon from '../icons/TickIcon';
+import ChevronIcon from '../icons/ChevronIcon';
 
 const loadingMessages = [
   'Pondering...',
@@ -39,13 +40,6 @@ const loadingMessages = [
   'Contemplating...',
 ];
 
-const previewingPrompts = [
-  'Give this a go',
-  'What do you think about this?',
-  "How's this?",
-  'Let me know what you think of this',
-];
-
 export default ({
   snippets,
   components,
@@ -55,8 +49,8 @@ export default ({
 }) => {
   const [state, dispatch] = useContext(StoreContext);
   const [error, setError] = useState('');
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('Generating...');
-  const [previewPrompt, setPreviewPrompt] = useState(previewingPrompts[0]);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -153,7 +147,13 @@ ${code}
 
   // Only checking starts with tag, as the end is not available until
   // streaming finishes
-  const isMessageACodeSnippet = (str: string) => /^<[\w]+/.test(str);
+  const isMessageStructuredResponse = (str: string) => str.startsWith('{');
+
+  const parseResponse = (str: string) => {
+    try {
+      return JSON.parse(str) as { jsxVariations: string[]; message: string };
+    } catch {}
+  };
 
   const {
     messages,
@@ -170,18 +170,17 @@ ${code}
     headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
     onFinish: (message) => {
-      if (
-        message.role === 'assistant' &&
-        isMessageACodeSnippet(message.content)
-      ) {
-        setPreviewPrompt(
-          previewingPrompts[
-            Math.floor(Math.random() * previewingPrompts.length)
-          ]
-        );
+      const parsedMessage = parseResponse(message.content);
+      if (message.role === 'assistant' && parsedMessage) {
         dispatch({
           type: 'previewSnippet',
-          payload: { snippet: { group: '', name: '', code: message.content } },
+          payload: {
+            snippet: {
+              group: '',
+              name: '',
+              code: parsedMessage.jsxVariations[0],
+            },
+          },
         });
       }
     },
@@ -277,17 +276,21 @@ ${code}
             <Stack space="large">
               {displayMessages
                 .filter(
-                  (msg) =>
+                  (msg, index) =>
                     !(
                       loading &&
-                      (!msg.content || isMessageACodeSnippet(msg.content))
+                      index === displayMessages.length - 1 &&
+                      (!msg.content || isMessageStructuredResponse(msg.content))
                     )
                 )
                 .map((msg, index) => {
-                  const messageIsCode = isMessageACodeSnippet(msg.content);
+                  const { jsxVariations, message } = parseResponse(
+                    msg.content
+                  ) ?? { jsxVariations: [] };
+                  const hasPreviewCode = jsxVariations.length > 0;
 
                   return (
-                    <Stack space="small" key={msg.id}>
+                    <Stack space="medium" key={msg.id}>
                       <Box
                         className={classNames([
                           styles.message,
@@ -300,10 +303,10 @@ ${code}
                             : undefined,
                         ])}
                       >
-                        {messageIsCode ? (
+                        {message ? (
                           <Text>
                             <span style={{ lineHeight: '1.5em' }}>
-                              {previewPrompt}
+                              {message}
                             </span>
                           </Text>
                         ) : (
@@ -315,7 +318,7 @@ ${code}
                             </Text>
                             {msg.experimental_attachments?.[0] ? (
                               <Box
-                                paddingTop="medium"
+                                paddingTop="small"
                                 className={styles.imageAttachment}
                               >
                                 <img
@@ -328,15 +331,69 @@ ${code}
                           </>
                         )}
                       </Box>
-                      {!loading && messageIsCode ? (
-                        <Box paddingX="medium">
-                          <Inline space="medium">
+                      {!loading && hasPreviewCode ? (
+                          <Inline space="medium" alignY="center">
+                            {jsxVariations.length > 1 ? (
+                              <>
+                                <Button
+                                  aria-label="Previous suggestion"
+                                  title="Previous suggestion"
+                                  variant="transparent"
+                                  disabled={suggestionIndex === 0}
+                                  onClick={() => {
+                                    const newIndex = suggestionIndex - 1;
+                                    setSuggestionIndex(newIndex);
+                                    dispatch({
+                                      type: 'previewSnippet',
+                                      payload: {
+                                        snippet: {
+                                          group: '',
+                                          name: '',
+                                          code: jsxVariations[newIndex],
+                                        },
+                                      },
+                                    });
+                                  }}
+                                >
+                                  <ChevronIcon direction="left" size={16} />
+                                </Button>
+                              <Text size="small">{`${suggestionIndex + 1} of ${
+                                jsxVariations.length
+                              }`}</Text>
+                                <Button
+                                  aria-label="Next suggestion"
+                                  title="Next suggestion"
+                                  variant="transparent"
+                                  disabled={
+                                    suggestionIndex === jsxVariations.length - 1
+                                  }
+                                  onClick={() => {
+                                    const newIndex = suggestionIndex + 1;
+                                    setSuggestionIndex(newIndex);
+                                    dispatch({
+                                      type: 'previewSnippet',
+                                      payload: {
+                                        snippet: {
+                                          group: '',
+                                          name: '',
+                                          code: jsxVariations[newIndex],
+                                        },
+                                      },
+                                    });
+                                  }}
+                                >
+                                  <ChevronIcon direction="right" size={16} />
+                                </Button>
+                              </>
+                            ) : null}
                             <Button
                               aria-label={copying ? 'Copied' : 'Copy code'}
                               title={copying ? 'Copied' : 'Copy code'}
                               variant="transparent"
                               tone={copying ? 'positive' : undefined}
-                              onClick={() => copyClick(msg.content)}
+                              onClick={() =>
+                                copyClick(jsxVariations[suggestionIndex])
+                              }
                             >
                               {copying ? (
                                 <TickIcon size={16} />
@@ -352,7 +409,7 @@ ${code}
                                 dispatch({
                                   type: 'updateCode',
                                   payload: {
-                                    code: msg.content,
+                                    code: jsxVariations[suggestionIndex],
                                   },
                                 })
                               }
@@ -360,24 +417,17 @@ ${code}
                               <AddIcon size={16} />
                             </Button>
                           </Inline>
-                        </Box>
                       ) : null}
                     </Stack>
                   );
                 })}
             </Stack>
-            {loading ? (
-              <Box paddingX="large">
-                <Text>{loadingMessage}</Text>
-              </Box>
-            ) : null}
+            {loading ? <Text>{loadingMessage}</Text> : null}
 
             {hasError ? (
-              <Box paddingX="large">
                 <Text tone="critical">
                   {error || chatError?.message || 'An error occurred'}
                 </Text>
-              </Box>
             ) : null}
           </Box>
         </ScrollContainer>
@@ -386,6 +436,8 @@ ${code}
           component="form"
           flexGrow={0}
           onSubmit={(e) => {
+            setError('');
+            setSuggestionIndex(0);
             handleSubmit(e, { experimental_attachments: getImageAttachment() });
             clearImageInput();
             textareaRef.current?.focus();

@@ -63,7 +63,7 @@ export const focusIndicator = style({
 const messagesEndBufferSize = 'xxlarge';
 export const messageContainer = style([
   sprinkles({
-    paddingX: 'medium',
+    paddingX: 'xxlarge',
     paddingBottom: messagesEndBufferSize,
     display: 'flex',
     flexDirection: 'column',
@@ -78,28 +78,34 @@ export const messageContainer = style([
 ]);
 
 export const message = style([
-  sprinkles({
-    padding: 'large',
-  }),
   {
     borderRadius: '12px', // xlarge
     width: 'fit-content',
   },
 ]);
 
-export const userMessage = style({
-  backgroundColor: colorPaletteVars.background.selection,
-  marginLeft: vars.space.xxlarge,
-  borderBottomRightRadius: 0,
-  alignSelf: 'flex-end',
-});
+export const userMessage = style([
+  sprinkles({
+    paddingX: 'large',
+    paddingY: 'medium',
+  }),
+  {
+    backgroundColor: colorPaletteVars.background.selection,
+    marginLeft: vars.space.xxlarge,
+    borderBottomRightRadius: 0,
+    alignSelf: 'flex-end',
+  },
+]);
 
-export const assistantMessage = style({
-  border: `1px solid ${colorPaletteVars.border.standard}`,
-  borderBottomLeftRadius: 0,
-  marginRight: vars.space.xxlarge,
-  alignSelf: 'flex-start',
-});
+export const assistantMessage = style([
+  // sprinkles({
+  //   paddingX: 'large',
+  // }),
+  {
+    marginRight: vars.space.xxlarge,
+    alignSelf: 'flex-start',
+  },
+]);
 
 export const groupMessageBlock = style({
   marginTop: calc(vars.space.medium).negate().toString(),
