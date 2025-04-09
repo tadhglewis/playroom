@@ -217,7 +217,7 @@ message must contain the follow-up message to the end user.
     error: chatError,
   } = useChat({
     api: 'http://localhost:15387/api/chat',
-    // api: 'https://indie-turtle.ssod.skinfra.xyz/_s2s/api/chat',
+    // api: 'https://braid-ai.ssod.skinfra.xyz/_s2s/api/chat',
     headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
     streamProtocol: 'text',
@@ -515,6 +515,9 @@ message must contain the follow-up message to the end user.
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
+              setError('');
+              setSuggestionIndex(0);
+              setPreviewId('');
               handleSubmit(e, {
                 experimental_attachments: getImageAttachment(),
               });
