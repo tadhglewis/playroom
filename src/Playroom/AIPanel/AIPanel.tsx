@@ -135,7 +135,8 @@ ${code}
     setMessages,
     error: chatError,
   } = useChat({
-    api: 'https://indie-turtle.ssod.skinfra.xyz/_s2s/api/chat',
+    api: 'http://localhost:15387/api/chat',
+    // api: 'https://indie-turtle.ssod.skinfra.xyz/_s2s/api/chat',
     headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
     onFinish: (message) => {
