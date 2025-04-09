@@ -140,10 +140,24 @@ ${code}
 
 ## Response Format (VERY IMPORTANT)
 
-- RETURN ONLY RAW AND VALID JSX CODE - no explanations, no markdown, no code blocks (.e.g \`\`\`JSX).
-- Your code will be directly rendered in the UI.
-- Ensure all opening tags have matching closing tags.
-- Include appropriate whitespace for readability.
+Return a JSON object in the following format:
+
+{
+  "1": "<JSX code>",
+  "2": "<JSX code>",
+  "3": "<JSX code>",
+  "4": "<JSX code>",
+  "5": "<JSX code>",
+  "6": "<JSX code>",
+  "7": "<JSX code>",
+  "8": "<JSX code>",
+  "9": "<JSX code>",
+  "message": "<message>"
+}
+
+1 must contain valid JSX. No explanations, no markdown, no code blocks (.e.g \`\`\`JSX). The code will be directly rendered in the UI. Ensure all opening tags have matching closing tags.
+2 to 9 are optional and can be used to provide alternative suggestions. If you have multiple suggestions, return them in the order of preference.
+message must contain the follow-up message to the end user.
 `;
 
   const preprompt: Message[] = [
@@ -185,7 +199,10 @@ ${code}
 
   const parseResponse = (str: string) => {
     try {
-      return JSON.parse(str) as { jsxVariations: string[]; message: string };
+      return JSON.parse(str) as {
+        message: string;
+        [key: string]: string;
+      };
     } catch {}
   };
 
@@ -203,6 +220,7 @@ ${code}
     // api: 'https://indie-turtle.ssod.skinfra.xyz/_s2s/api/chat',
     headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
+    streamProtocol: 'text',
     onFinish: (message) => {
       const parsedMessage = parseResponse(message.content);
       if (message.role === 'assistant' && parsedMessage) {
@@ -211,7 +229,7 @@ ${code}
         dispatch({
           type: 'previewSuggestion',
           payload: {
-            code: parsedMessage.jsxVariations[0],
+            code: parsedMessage['1'],
           },
         });
       }
@@ -316,9 +334,12 @@ ${code}
                     )
                 )
                 .map((msg, index) => {
-                  const { jsxVariations, message } = parseResponse(
-                    msg.content
-                  ) ?? { jsxVariations: [] };
+                  const { message, ...rest } = parseResponse(msg.content) ?? {
+                    jsx: '',
+                  };
+
+                  const jsxVariations = Object.values(rest);
+
                   const hasPreviewCode = jsxVariations.length > 0;
 
                   return (
@@ -482,12 +503,14 @@ ${code}
           flexGrow={0}
           onSubmit={(e) => {
             if (!loading) {
-            setError('');
-            setSuggestionIndex(0);
-            setPreviewId('');
-            handleSubmit(e, { experimental_attachments: getImageAttachment() });
-            clearImageInput();
-            textareaRef.current?.focus();
+              setError('');
+              setSuggestionIndex(0);
+              setPreviewId('');
+              handleSubmit(e, {
+                experimental_attachments: getImageAttachment(),
+              });
+              clearImageInput();
+              textareaRef.current?.focus();
             }
           }}
           onKeyDown={(e) => {
