@@ -6,6 +6,7 @@ import * as styles from './Button.css';
 interface BaseProps {
   as?: ElementType;
   tone?: 'positive';
+  variant?: keyof typeof styles.variants;
   icon?: ReactElement;
 }
 
@@ -24,13 +25,21 @@ export const Button = ({
   children,
   icon,
   tone,
+  variant = 'ghost',
+  disabled,
   ...props
 }: Props) => (
   <ButtonComponent
-    className={classnames(styles.reset, styles.base, {
-      [styles.positive]: tone === 'positive',
-    })}
-    disabled={tone === 'positive'}
+    className={classnames(
+      styles.reset,
+      styles.base,
+      styles.variants[variant!],
+      {
+        [styles.positive]: tone === 'positive',
+        [styles.disabled]: disabled,
+      }
+    )}
+    disabled={disabled || tone === 'positive'}
     {...props}
   >
     {children}

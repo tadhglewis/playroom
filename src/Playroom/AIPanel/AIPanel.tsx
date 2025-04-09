@@ -20,6 +20,31 @@ import { TextLinkButton } from '../TextLinkButton/TextLinkButton';
 import { Spread } from '../Spread/Spread';
 import { ScrollContainer } from '../ScrollContainer/ScrollContainer';
 import classNames from 'classnames';
+import CopyIcon from '../icons/CopyIcon';
+import DismissIcon from '../icons/DismissIcon';
+import AddIcon from '../icons/AddIcon';
+import { useCopy } from '../../utils/useCopy';
+import TickIcon from '../icons/TickIcon';
+
+const loadingMessages = [
+  'Pondering...',
+  'Vibe coding...',
+  'Procrastinating...',
+  'Fiddling...',
+  'Overthinking...',
+  'Daydreaming...',
+  'Turtle-coding...',
+  'Shell-scripting...',
+  'Considering...',
+  'Contemplating...',
+];
+
+const previewingPrompts = [
+  'Give this a go',
+  'What do you think about this?',
+  "How's this?",
+  'Let me know what you think of this',
+];
 
 export default ({
   snippets,
@@ -31,6 +56,7 @@ export default ({
   const [state, dispatch] = useContext(StoreContext);
   const [error, setError] = useState('');
   const [loadingMessage, setLoadingMessage] = useState('Generating...');
+  const [previewPrompt, setPreviewPrompt] = useState(previewingPrompts[0]);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -125,6 +151,10 @@ ${code}
     }
   };
 
+  // Only checking starts with tag, as the end is not available until
+  // streaming finishes
+  const isMessageACodeSnippet = (str: string) => /^<[\w]+/.test(str);
+
   const {
     messages,
     input,
@@ -140,12 +170,20 @@ ${code}
     headers: { 'X-Request-Via': 'SSOD' },
     initialMessages: preprompt,
     onFinish: (message) => {
-      dispatch({
-        type: 'updateCode',
-        payload: {
-          code: message.content,
-        },
-      });
+      if (
+        message.role === 'assistant' &&
+        isMessageACodeSnippet(message.content)
+      ) {
+        setPreviewPrompt(
+          previewingPrompts[
+            Math.floor(Math.random() * previewingPrompts.length)
+          ]
+        );
+        dispatch({
+          type: 'previewSnippet',
+          payload: { snippet: { group: '', name: '', code: message.content } },
+        });
+      }
     },
     onError: (err) => {
       setError(err.message || 'An error occurred while generating UI');
@@ -160,19 +198,6 @@ ${code}
 
   useEffect(() => {
     if (status === 'streaming' || status === 'submitted') {
-      const loadingMessages = [
-        'Pondering...',
-        'Vibe coding...',
-        'Procrastinating...',
-        'Fiddling...',
-        'Overthinking...',
-        'Daydreaming...',
-        'Turtle-coding...',
-        'Shell-scripting...',
-        'Considering...',
-        'Contemplating...',
-      ];
-
       const intervalId = setInterval(() => {
         const randomIndex = Math.floor(Math.random() * loadingMessages.length);
         setLoadingMessage(loadingMessages[randomIndex]);
@@ -229,6 +254,8 @@ ${code}
     el?.scrollTo(0, el.scrollHeight);
   }, [displayMessages.length, loading, hasError]);
 
+  const { copyClick, copying } = useCopy();
+
   return (
     <Box component="aside" className={styles.root}>
       <Box position="absolute" inset={0} display="flex" flexDirection="column">
@@ -248,46 +275,100 @@ ${code}
         >
           <Box className={styles.messageContainer}>
             <Stack space="large">
-              {displayMessages.map((msg, index) => (
-                <Box
-                  key={msg.id}
-                  className={classNames([
-                    styles.message,
-                    msg.role === 'user'
-                      ? styles.userMessage
-                      : styles.assistantMessage,
+              {displayMessages
+                .filter(
+                  (msg) =>
+                    !(
+                      loading &&
+                      (!msg.content || isMessageACodeSnippet(msg.content))
+                    )
+                )
+                .map((msg, index) => {
+                  const messageIsCode = isMessageACodeSnippet(msg.content);
 
-                    displayMessages[index - 1]?.role === msg.role
-                      ? styles.groupMessageBlock
-                      : undefined,
-                  ])}
-                >
-                  <Text>
-                    {msg.role === 'user' || msg.id === 'welcome'
-                      ? msg.content
-                      : `${msg.content.slice(
-                          msg.content.length - 100,
-                          msg.content.length
-                        )}...`}
-                  </Text>
-                  {msg.experimental_attachments?.[0] ? (
-                    <Box paddingTop="medium" className={styles.imageAttachment}>
-                      <img
-                        src={msg.experimental_attachments[0].url}
-                        className={styles.attachmentImage}
-                        alt="Uploaded"
-                      />
-                    </Box>
-                  ) : null}
-                </Box>
-              ))}
+                  return (
+                    <Stack space="small" key={msg.id}>
+                      <Box
+                        className={classNames([
+                          styles.message,
+                          msg.role === 'user'
+                            ? styles.userMessage
+                            : styles.assistantMessage,
+
+                          displayMessages[index - 1]?.role === msg.role
+                            ? styles.groupMessageBlock
+                            : undefined,
+                        ])}
+                      >
+                        {messageIsCode ? (
+                          <Text>
+                            <span style={{ lineHeight: '1.5em' }}>
+                              {previewPrompt}
+                            </span>
+                          </Text>
+                        ) : (
+                          <>
+                            <Text>
+                              <span style={{ lineHeight: '1.5em' }}>
+                                {msg.content}
+                              </span>
+                            </Text>
+                            {msg.experimental_attachments?.[0] ? (
+                              <Box
+                                paddingTop="medium"
+                                className={styles.imageAttachment}
+                              >
+                                <img
+                                  src={msg.experimental_attachments[0].url}
+                                  className={styles.attachmentImage}
+                                  alt="Uploaded"
+                                />
+                              </Box>
+                            ) : null}
+                          </>
+                        )}
+                      </Box>
+                      {!loading && messageIsCode ? (
+                        <Box paddingX="medium">
+                          <Inline space="medium">
+                            <Button
+                              aria-label={copying ? 'Copied' : 'Copy code'}
+                              title={copying ? 'Copied' : 'Copy code'}
+                              variant="transparent"
+                              tone={copying ? 'positive' : undefined}
+                              onClick={() => copyClick(msg.content)}
+                            >
+                              {copying ? (
+                                <TickIcon size={16} />
+                              ) : (
+                                <CopyIcon size={16} />
+                              )}
+                            </Button>
+                            <Button
+                              aria-label="Apply code"
+                              title="Apply code"
+                              variant="transparent"
+                              onClick={() =>
+                                dispatch({
+                                  type: 'updateCode',
+                                  payload: {
+                                    code: msg.content,
+                                  },
+                                })
+                              }
+                            >
+                              <AddIcon size={16} />
+                            </Button>
+                          </Inline>
+                        </Box>
+                      ) : null}
+                    </Stack>
+                  );
+                })}
             </Stack>
             {loading ? (
               <Box paddingX="large">
-                <Text>
-                  <span className={styles.turtle}>🐢</span>
-                  {loadingMessage}
-                </Text>
+                <Text>{loadingMessage}</Text>
               </Box>
             ) : null}
 
@@ -307,6 +388,7 @@ ${code}
           onSubmit={(e) => {
             handleSubmit(e, { experimental_attachments: getImageAttachment() });
             clearImageInput();
+            textareaRef.current?.focus();
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -332,17 +414,7 @@ ${code}
                     aria-label="Remove image"
                     title="Remove image"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      xmlSpace="preserve"
-                      focusable="false"
-                      fill="currentColor"
-                      width={16}
-                      height={16}
-                    >
-                      <path d="m13.4 12 5.3-5.3c.4-.4.4-1 0-1.4s-1-.4-1.4 0L12 10.6 6.7 5.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l5.3 5.3-5.3 5.3c-.4.4-.4 1 0 1.4.2.2.4.3.7.3s.5-.1.7-.3l5.3-5.3 5.3 5.3c.2.2.5.3.7.3s.5-.1.7-.3c.4-.4.4-1 0-1.4L13.4 12z" />
-                    </svg>
+                    <DismissIcon size={16} />
                   </button>
                 </Box>
               </Box>
@@ -369,6 +441,7 @@ ${code}
                       htmlFor="image-upload"
                       aria-label="Upload Image"
                       title="Upload Image"
+                      variant="transparent"
                       onKeyUp={(ev: KeyboardEvent<HTMLElement>) => {
                         if (ev.key === 'Enter') {
                           fileInputRef.current?.click();
@@ -410,18 +483,40 @@ ${code}
                         : 'Generate UI'
                     }
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      xmlSpace="preserve"
-                      focusable="false"
-                      fill="currentColor"
-                      width={20}
-                      height={20}
-                      opacity={input.trim().length === 0 ? 0.6 : undefined}
-                    >
-                      <path d="M22 3c0-.1 0-.2-.1-.3v-.1c0-.1-.1-.2-.2-.3-.1-.1-.2-.1-.3-.2h-.1c-.1-.1-.2-.1-.3-.1h-.3l-19 6c-.4.2-.6.5-.7.9 0 .4.1.8.5 1l7.8 4.9 4.9 7.8c.2.3.5.5.8.5h.1c.4 0 .7-.3.8-.7l6-19c.1-.2.1-.3.1-.4zm-4.6 2.2-7.5 7.5-5.5-3.4 13-4.1zm-2.7 14.4-3.4-5.5 7.5-7.5-4.1 13z" />
-                    </svg>
+                    {loading ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="xMidYMid"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        className={styles.loader}
+                      >
+                        <circle
+                          strokeLinecap="round"
+                          strokeDasharray="70"
+                          stroke="currentcolor"
+                          strokeWidth="8"
+                          r="46"
+                          cy="50"
+                          cx="50"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        xmlSpace="preserve"
+                        focusable="false"
+                        fill="currentColor"
+                        width={20}
+                        height={20}
+                        opacity={input.trim().length === 0 ? 0.6 : undefined}
+                      >
+                        <path d="M22 3c0-.1 0-.2-.1-.3v-.1c0-.1-.1-.2-.2-.3-.1-.1-.2-.1-.3-.2h-.1c-.1-.1-.2-.1-.3-.1h-.3l-19 6c-.4.2-.6.5-.7.9 0 .4.1.8.5 1l7.8 4.9 4.9 7.8c.2.3.5.5.8.5h.1c.4 0 .7-.3.8-.7l6-19c.1-.2.1-.3.1-.4zm-4.6 2.2-7.5 7.5-5.5-3.4 13-4.1zm-2.7 14.4-3.4-5.5 7.5-7.5-4.1 13z" />
+                      </svg>
+                    )}
                   </Button>
                 </Spread>
               </Box>

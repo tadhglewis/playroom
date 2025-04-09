@@ -60,21 +60,6 @@ export const focusIndicator = style({
   },
 });
 
-export const message = style([
-  sprinkles({
-    padding: 'large',
-  }),
-  {
-    borderRadius: '12px', // xlarge
-    width: 'fit-content',
-  },
-]);
-
-export const groupMessageBlock = style({
-  marginTop: calc(vars.space.medium).negate().toString(),
-  borderTopRightRadius: 0,
-});
-
 const messagesEndBufferSize = 'xxlarge';
 export const messageContainer = style([
   sprinkles({
@@ -92,6 +77,16 @@ export const messageContainer = style([
   },
 ]);
 
+export const message = style([
+  sprinkles({
+    padding: 'large',
+  }),
+  {
+    borderRadius: '12px', // xlarge
+    width: 'fit-content',
+  },
+]);
+
 export const userMessage = style({
   backgroundColor: colorPaletteVars.background.selection,
   marginLeft: vars.space.xxlarge,
@@ -104,6 +99,18 @@ export const assistantMessage = style({
   borderBottomLeftRadius: 0,
   marginRight: vars.space.xxlarge,
   alignSelf: 'flex-start',
+});
+
+export const groupMessageBlock = style({
+  marginTop: calc(vars.space.medium).negate().toString(),
+  selectors: {
+    [`${userMessage}&`]: {
+      borderTopRightRadius: 0,
+    },
+    [`${assistantMessage}&`]: {
+      borderTopLeftRadius: 0,
+    },
+  },
 });
 
 export const imageInput = style([
@@ -150,8 +157,8 @@ export const clearImage = style([
     '::before': {
       content: '',
       position: 'absolute',
-      height: 44,
-      width: 44,
+      height: vars.touchableSize,
+      width: vars.touchableSize,
       flexShrink: 0,
     },
   },
@@ -170,20 +177,15 @@ export const attachmentImage = style([
   },
 ]);
 
-const spinAndPulse = keyframes({
-  '0%': {
-    transform: 'rotate(0deg) scale(1)',
-  },
-  '50%': {
-    transform: 'rotate(180deg) scale(1.5)',
-  },
-  '100%': {
-    transform: 'rotate(360deg) scale(1)',
+const spin = keyframes({
+  to: {
+    transform: 'rotate(360deg)',
   },
 });
 
-export const turtle = style({
-  display: 'inline-block',
-  animation: `${spinAndPulse} 1.5s ease-in-out infinite`,
-  marginRight: 10,
+export const loader = style({
+  animationName: spin,
+  animationIterationCount: 'infinite',
+  animationDuration: '.8s',
+  color: 'currentcolor',
 });

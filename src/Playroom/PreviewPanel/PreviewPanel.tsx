@@ -2,13 +2,15 @@ import { useState } from 'react';
 
 import usePreviewUrl from '../../utils/usePreviewUrl';
 import { ThemeSelector } from './ThemeSelector';
-import { CopyButton } from './CopyButton';
 import { Heading } from '../Heading/Heading';
 import { ToolbarPanel } from '../ToolbarPanel/ToolbarPanel';
 import { Stack } from '../Stack/Stack';
 import { Inline } from '../Inline/Inline';
 import PlayIcon from '../icons/PlayIcon';
 import { Button } from '../Button/Button';
+import { useCopy } from '../../utils/useCopy';
+import TickIcon from '../icons/TickIcon';
+import ShareIcon from '../icons/ShareIcon';
 
 interface PreviewPanelProps {
   themes: string[];
@@ -26,6 +28,7 @@ export default ({ themes, visibleThemes }: PreviewPanelProps) => {
   const isThemed = themes.length > 1;
 
   const prototypeUrl = usePreviewUrl(activeTheme);
+  const { copyClick, copying } = useCopy();
 
   return (
     <ToolbarPanel>
@@ -54,10 +57,14 @@ export default ({ themes, visibleThemes }: PreviewPanelProps) => {
           >
             Open
           </Button>
-          <CopyButton
-            copyContent={prototypeUrl}
+          <Button
+            onClick={() => copyClick(prototypeUrl)}
             title="Copy preview link to clipboard"
-          />
+            tone={copying ? 'positive' : undefined}
+            icon={copying ? <TickIcon size={18} /> : <ShareIcon size={18} />}
+          >
+            {copying ? 'Copied ' : 'Copy link '}
+          </Button>
         </Inline>
       </Stack>
     </ToolbarPanel>

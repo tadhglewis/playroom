@@ -21,7 +21,6 @@ export const reset = style([
     textDecoration: 'none',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
-    height: vars.touchableSize,
     WebkitTapHighlightColor: 'transparent',
   },
 ]);
@@ -32,7 +31,6 @@ export const base = style([
   sprinkles({
     borderRadius: 'large',
     paddingY: 'none',
-    paddingX: 'large',
     font: 'standard',
   }),
   {
@@ -40,8 +38,6 @@ export const base = style([
       [highlightColor]: 'currentColor',
     },
     color: highlightColor,
-    border: `1px solid ${colorPaletteVars.foreground.neutralSoft}`,
-    height: calc(vars.grid).multiply(9).toString(),
     '::after': {
       content: '',
       position: 'absolute',
@@ -54,9 +50,6 @@ export const base = style([
       top: '50%',
     },
     selectors: {
-      [`&:disabled`]: {
-        opacity: 0.6,
-      },
       [`&:not(:disabled)`]: {
         cursor: 'pointer',
       },
@@ -77,6 +70,31 @@ export const base = style([
     },
   },
 ]);
+
+export const disabled = style({
+  selectors: {
+    [`&:disabled`]: {
+      opacity: 0.6,
+    },
+  },
+});
+
+export const variants = {
+  ghost: style([
+    sprinkles({
+      paddingX: 'large',
+    }),
+    {
+      height: calc(vars.grid).multiply(9).toString(),
+      border: `1px solid ${colorPaletteVars.foreground.neutralSoft}`,
+    },
+  ]),
+  transparent: style([
+    sprinkles({
+      // paddingX: 'small',
+    }),
+  ]),
+};
 
 export const positive = style({
   vars: {
