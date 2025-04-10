@@ -27,6 +27,7 @@ import { useCopy } from '../../utils/useCopy';
 import TickIcon from '../icons/TickIcon';
 import ChevronIcon from '../icons/ChevronIcon';
 import PlayIcon from '../icons/PlayIcon';
+import { TalkButton } from './TalkButton';
 
 const loadingMessages = [
   'Pondering...',
@@ -40,6 +41,16 @@ const loadingMessages = [
   'Considering...',
   'Contemplating...',
 ];
+
+const speakThis = (str: string) => {
+  const synth = window.speechSynthesis;
+  const voices = synth.getVoices();
+  const utterThis = new SpeechSynthesisUtterance(str);
+  utterThis.voice = voices[0];
+  utterThis.pitch = 1; // Eg. min="0" max="2" value="1" step="0.1"
+  utterThis.rate = 1.4; // Eg. min="0.5" max="2" value="1" step="0.1"
+  synth.speak(utterThis);
+};
 
 const pxToInt = (str: string | null) =>
   typeof str === 'string' ? parseInt(str.replace('px', ''), 10) : 0;
@@ -322,6 +333,8 @@ Generate and return only 1 unless specifically asked to generate multiple versio
             code: parsedMessage['1'],
           },
         });
+
+        speakThis(parsedMessage.message);
       }
     },
     onError: (err) => {
@@ -570,6 +583,28 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                           >
                             <AddIcon size={16} />
                           </Button>
+                          {message ? (
+                            <Button
+                              aria-label="Listen to assistant"
+                              title="Listen to assistant"
+                              variant="transparent"
+                              onClick={() => {
+                                speakThis(message);
+                              }}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentcolor"
+                                height="16"
+                                width="16"
+                                viewBox="0 0 489.6 489.6"
+                              >
+                                <path d="M361.1,337.6c2.2,1.5,4.6,2.3,7.1,2.3c3.8,0,7.6-1.8,10-5.2c18.7-26.3,28.5-57.4,28.5-89.9s-9.9-63.6-28.5-89.9    c-3.9-5.5-11.6-6.8-17.1-2.9c-5.5,3.9-6.8,11.6-2.9,17.1c15.7,22.1,24,48.3,24,75.8c0,27.4-8.3,53.6-24,75.8    C354.3,326.1,355.6,333.7,361.1,337.6z" />
+                                <path d="M425.4,396.3c2.2,1.5,4.6,2.3,7.1,2.3c3.8,0,7.6-1.8,10-5.2c30.8-43.4,47.1-94.8,47.1-148.6s-16.3-105.1-47.1-148.6    c-3.9-5.5-11.6-6.8-17.1-2.9c-5.5,3.9-6.8,11.6-2.9,17.1c27.9,39.3,42.6,85.7,42.6,134.4c0,48.6-14.7,95.1-42.6,134.4    C418.6,384.7,419.9,392.3,425.4,396.3z" />
+                                <path d="M254.7,415.7c4.3,2.5,9.2,3.8,14.2,3.8l0,0c7.4,0,14.4-2.8,19.7-7.9c5.6-5.4,8.7-12.6,8.7-20.4V98.5    c0-15.7-12.7-28.4-28.4-28.4c-4.9,0-9.8,1.3-14.2,3.8c-0.3,0.2-0.6,0.3-0.8,0.5l-100.1,69.2H73.3C32.9,143.6,0,176.5,0,216.9v55.6    c0,40.4,32.9,73.3,73.3,73.3h84.5l95.9,69.2C254,415.3,254.4,415.5,254.7,415.7z M161.8,321.3H73.3c-26.9,0-48.8-21.9-48.8-48.8    v-55.6c0-26.9,21.9-48.8,48.8-48.8h84.3c2.5,0,4.9-0.8,7-2.2l102.7-71c0.5-0.3,1.1-0.4,1.6-0.4c1.6,0,3.9,1.2,3.9,3.9v292.7    c0,1.1-0.4,2-1.1,2.8c-0.7,0.7-1.8,1.1-2.7,1.1c-0.5,0-1-0.1-1.5-0.3l-98.4-71.1C166.9,322.1,164.4,321.3,161.8,321.3z" />
+                              </svg>
+                            </Button>
+                          ) : null}
                         </Inline>
                       ) : null}
                     </Stack>
@@ -689,58 +724,68 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                       </svg>
                     </Button>
                   </Inline>
-                  <Button
-                    type="submit"
-                    disabled={input.trim().length === 0}
-                    tone={
-                      input.trim().length > 0 || loading ? 'accent' : undefined
-                    }
-                    aria-label={
-                      input.trim().length === 0
-                        ? 'Enter a prompt to generate UI'
-                        : 'Generate UI'
-                    }
-                    title={
-                      input.trim().length === 0
-                        ? 'Enter a prompt to generate UI'
-                        : 'Generate UI'
-                    }
-                  >
-                    {loading ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 100 100"
-                        preserveAspectRatio="xMidYMid"
-                        width="20"
-                        height="20"
-                        fill="none"
-                        className={styles.loader}
-                      >
-                        <circle
-                          strokeLinecap="round"
-                          strokeDasharray="70"
-                          stroke="currentcolor"
-                          strokeWidth="8"
-                          r="46"
-                          cy="50"
-                          cx="50"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        xmlSpace="preserve"
-                        focusable="false"
-                        fill="currentColor"
-                        width={20}
-                        height={20}
-                        opacity={input.trim().length === 0 ? 0.6 : undefined}
-                      >
-                        <path d="M22 3c0-.1 0-.2-.1-.3v-.1c0-.1-.1-.2-.2-.3-.1-.1-.2-.1-.3-.2h-.1c-.1-.1-.2-.1-.3-.1h-.3l-19 6c-.4.2-.6.5-.7.9 0 .4.1.8.5 1l7.8 4.9 4.9 7.8c.2.3.5.5.8.5h.1c.4 0 .7-.3.8-.7l6-19c.1-.2.1-.3.1-.4zm-4.6 2.2-7.5 7.5-5.5-3.4 13-4.1zm-2.7 14.4-3.4-5.5 7.5-7.5-4.1 13z" />
-                      </svg>
-                    )}
-                  </Button>
+
+                  <Inline space="small" nowrap>
+                    <TalkButton
+                      aria-label="Speak"
+                      title="Speak"
+                      onComplete={setInput}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={input.trim().length === 0}
+                      tone={
+                        input.trim().length > 0 || loading
+                          ? 'accent'
+                          : undefined
+                      }
+                      aria-label={
+                        input.trim().length === 0
+                          ? 'Enter a prompt to generate UI'
+                          : 'Generate UI'
+                      }
+                      title={
+                        input.trim().length === 0
+                          ? 'Enter a prompt to generate UI'
+                          : 'Generate UI'
+                      }
+                    >
+                      {loading ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 100 100"
+                          preserveAspectRatio="xMidYMid"
+                          width="20"
+                          height="20"
+                          fill="none"
+                          className={styles.loader}
+                        >
+                          <circle
+                            strokeLinecap="round"
+                            strokeDasharray="70"
+                            stroke="currentcolor"
+                            strokeWidth="8"
+                            r="46"
+                            cy="50"
+                            cx="50"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          xmlSpace="preserve"
+                          focusable="false"
+                          fill="currentColor"
+                          width={20}
+                          height={20}
+                          opacity={input.trim().length === 0 ? 0.6 : undefined}
+                        >
+                          <path d="M22 3c0-.1 0-.2-.1-.3v-.1c0-.1-.1-.2-.2-.3-.1-.1-.2-.1-.3-.2h-.1c-.1-.1-.2-.1-.3-.1h-.3l-19 6c-.4.2-.6.5-.7.9 0 .4.1.8.5 1l7.8 4.9 4.9 7.8c.2.3.5.5.8.5h.1c.4 0 .7-.3.8-.7l6-19c.1-.2.1-.3.1-.4zm-4.6 2.2-7.5 7.5-5.5-3.4 13-4.1zm-2.7 14.4-3.4-5.5 7.5-7.5-4.1 13z" />
+                        </svg>
+                      )}
+                    </Button>
+                  </Inline>
                 </Spread>
               </Box>
             </Stack>

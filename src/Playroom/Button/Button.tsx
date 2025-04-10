@@ -10,7 +10,7 @@ interface BaseProps {
   icon?: ReactElement;
 }
 
-interface ButtonProps
+export interface ButtonProps
   extends Omit<AllHTMLAttributes<HTMLButtonElement>, 'as'>,
     BaseProps {}
 
