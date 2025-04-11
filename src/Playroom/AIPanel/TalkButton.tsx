@@ -24,24 +24,30 @@ export const TalkButton = ({
   ...restProps
 }: Props) => {
   const [listening, setListening] = useState(false);
+  const [initialised, setInitialised] = useState(false);
   const speechRef = useRef<SpeechInstance | null>(null);
 
   useEffect(() => {
-    // @ts-expect-error No types yet
-    const recognition = new (window.SpeechRecognition ||
+    const SpeechAPI =
+      // @ts-expect-error No types yet
+      window.SpeechRecognition ||
       // @ts-expect-error No types yet
       window.webkitSpeechRecognition ||
       // @ts-expect-error No types yet
       window.mozSpeechRecognition ||
       // @ts-expect-error No types yet
-      window.msSpeechRecognition)();
+      window.msSpeechRecognition;
 
-    recognition.lang = 'en_US';
+    if (SpeechAPI) {
+      const recognition = new SpeechAPI();
+      recognition.lang = 'en_US';
+      speechRef.current = recognition as SpeechInstance;
+    }
 
-    speechRef.current = recognition as SpeechInstance;
+    setInitialised(true);
   }, []);
 
-  return (
+  return initialised && speechRef.current ? (
     <Button
       {...restProps}
       tone={tone || (listening ? 'accent' : undefined)}
@@ -72,5 +78,5 @@ export const TalkButton = ({
         </svg>
       )}
     </Button>
-  );
+  ) : null;
 };
