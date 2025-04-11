@@ -42,8 +42,7 @@ const loadingMessages = [
   'Contemplating...',
 ];
 
-const speakThis = (str: string) => {
-  const synth = window.speechSynthesis;
+const speakThis = (str: string, synth: typeof window.speechSynthesis) => {
   const voices = synth.getVoices();
   const utterThis = new SpeechSynthesisUtterance(str);
   utterThis.voice = voices[0];
@@ -100,6 +99,14 @@ export default ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messageContainerRef = useRef<HTMLElement>(null);
+  const speechRef = useRef<typeof window.speechSynthesis | null>(null);
+
+  useEffect(() => {
+    speechRef.current = window.speechSynthesis;
+    // First use of synth does not pick up the correct voice.
+    // Calling `getVoices` straight up resolves this.
+    speechRef.current.getVoices();
+  }, []);
 
   const systemPrompt = `
 You are an expert React developer specializing in UI component composition. Your task is to help users create UI layouts using only the components provided.
@@ -333,8 +340,6 @@ Generate and return only 1 unless specifically asked to generate multiple versio
             code: parsedMessage['1'],
           },
         });
-
-        speakThis(parsedMessage.message);
       }
     },
     onError: (err) => {
@@ -589,7 +594,9 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                               title="Listen to assistant"
                               variant="transparent"
                               onClick={() => {
-                                speakThis(message);
+                                if (speechRef.current) {
+                                  speakThis(message, speechRef.current);
+                                }
                               }}
                             >
                               <svg
