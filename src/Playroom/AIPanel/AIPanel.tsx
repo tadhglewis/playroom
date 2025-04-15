@@ -68,9 +68,15 @@ const calculateLines = (
   }
 
   const padding = pxToInt(paddingTop) + pxToInt(paddingBottom);
+  // Workaround for `scrollHeight` not decreasing once it has grown
+  // is to set the height to zero first, then to the `scrollHeight`
+  // (we remove it after the calculation)
+  target.style.height = '0';
+  target.style.height = `${target.scrollHeight}px`;
   const currentRows = Math.floor(
     (target.scrollHeight - padding) / pxToInt(lineHeight)
   );
+  target.style.removeProperty('height');
 
   if (target && target.value === '') {
     return lines;
