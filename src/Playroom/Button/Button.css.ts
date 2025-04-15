@@ -37,19 +37,23 @@ export const base = style([
     vars: {
       [highlightColor]: 'currentColor',
     },
+    pointerEvents: 'auto',
     color: highlightColor,
-    '::after': {
-      content: '',
-      position: 'absolute',
-      transform: 'translateY(-50%)',
-      minHeight: vars.touchableSize,
-      minWidth: vars.touchableSize,
-      left: calc(vars.grid).multiply(2).negate().toString(),
-      right: calc(vars.grid).multiply(2).negate().toString(),
-      height: '100%',
-      top: '50%',
+    ':disabled': {
+      pointerEvents: 'none',
     },
     selectors: {
+      [`&:not(:disabled)::after`]: {
+        content: '',
+        position: 'absolute',
+        transform: 'translateY(-50%)',
+        minHeight: vars.touchableSize,
+        minWidth: vars.touchableSize,
+        left: calc(vars.grid).multiply(2).negate().toString(),
+        right: calc(vars.grid).multiply(2).negate().toString(),
+        height: '100%',
+        top: '50%',
+      },
       [`&:not(:disabled)`]: {
         cursor: 'pointer',
       },
@@ -82,7 +86,7 @@ export const disabled = style({
 export const variants = {
   ghost: style([
     sprinkles({
-      paddingX: 'large',
+      paddingX: 'medium',
     }),
     {
       height: calc(vars.grid).multiply(9).toString(),

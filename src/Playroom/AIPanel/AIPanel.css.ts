@@ -1,4 +1,4 @@
-import { keyframes, style } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { sprinkles, colorPaletteVars } from '../sprinkles.css';
 import { vars } from '../vars.css';
 import { calc } from '@vanilla-extract/css-utils';
@@ -85,39 +85,42 @@ export const message = style([
   },
 ]);
 
-export const userMessage = style([
-  sprinkles({
-    paddingX: 'large',
-    paddingY: 'medium',
-  }),
-  {
-    backgroundColor: colorPaletteVars.background.selection,
-    marginLeft: vars.space.xxlarge,
-    borderBottomRightRadius: 0,
-    alignSelf: 'flex-end',
-  },
-]);
-
 export const assistantMessage = style([
-  // sprinkles({
-  //   paddingX: 'large',
-  // }),
   {
     marginRight: vars.space.xxlarge,
     alignSelf: 'flex-start',
   },
 ]);
 
-export const groupMessageBlock = style({
-  marginTop: calc(vars.space.medium).negate().toString(),
+export const userMessage = style([
+  sprinkles({
+    paddingX: 'large',
+    paddingY: 'medium',
+  }),
+  {
+    backgroundColor: colorPaletteVars.background.neutral,
+    marginLeft: vars.space.xxlarge,
+    borderBottomRightRadius: 0,
+    alignSelf: 'flex-end',
+  },
+]);
+
+export const userMessageBlock = style({
   selectors: {
     [`${userMessage}&`]: {
+      marginTop: calc(vars.space.large).negate().toString(),
       borderTopRightRadius: 0,
     },
-    [`${assistantMessage}&`]: {
-      borderTopLeftRadius: 0,
-    },
   },
+});
+
+export const messageContent = style({
+  lineHeight: '1.5em',
+});
+
+export const readMessage = style({
+  verticalAlign: 'middle',
+  display: 'inline-block',
 });
 
 export const imageInput = style([
@@ -183,16 +186,3 @@ export const attachmentImage = style([
     objectFit: 'contain',
   },
 ]);
-
-const spin = keyframes({
-  to: {
-    transform: 'rotate(360deg)',
-  },
-});
-
-export const loader = style({
-  animationName: spin,
-  animationIterationCount: 'infinite',
-  animationDuration: '.8s',
-  color: 'currentcolor',
-});

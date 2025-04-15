@@ -13,21 +13,20 @@ import { Stack } from '../Stack/Stack';
 import { Text } from '../Text/Text';
 import { Button } from '../Button/Button';
 import { Box } from '../Box/Box';
-import * as styles from './AIPanel.css';
 import type { PlayroomProps } from '../Playroom';
 import { Inline } from '../Inline/Inline';
 import { TextLinkButton } from '../TextLinkButton/TextLinkButton';
 import { Spread } from '../Spread/Spread';
 import { ScrollContainer } from '../ScrollContainer/ScrollContainer';
-import classNames from 'classnames';
-import CopyIcon from '../icons/CopyIcon';
 import DismissIcon from '../icons/DismissIcon';
-import AddIcon from '../icons/AddIcon';
-import { useCopy } from '../../utils/useCopy';
-import TickIcon from '../icons/TickIcon';
-import ChevronIcon from '../icons/ChevronIcon';
-import PlayIcon from '../icons/PlayIcon';
 import { TalkButton } from './TalkButton';
+import SpeakerIcon from '../icons/SpeakerIcon';
+import LoadingIcon from '../icons/LoadingIcon';
+import SendIcon from '../icons/SendIcon';
+import ImageIcon from '../icons/ImageIcon';
+import { AISnippet } from './AISnippet';
+
+import * as styles from './AIPanel.css';
 
 const loadingMessages = [
   'Pondering...',
@@ -396,7 +395,9 @@ Generate and return only 1 unless specifically asked to generate multiple versio
     !hasError && (status === 'streaming' || status === 'submitted');
 
   const getImageAttachment = () => {
-    if (!imageDataUrl) return [];
+    if (!imageDataUrl) {
+      return [];
+    }
 
     return [
       {
@@ -410,8 +411,6 @@ Generate and return only 1 unless specifically asked to generate multiple versio
     const el = messageContainerRef.current;
     el?.scrollTo(0, el.scrollHeight);
   }, [displayMessages.length, loading, hasError]);
-
-  const { copyClick, copying } = useCopy();
 
   return (
     <Box component="aside" className={styles.root}>
@@ -431,7 +430,7 @@ Generate and return only 1 unless specifically asked to generate multiple versio
           fadeSize="small"
         >
           <Box className={styles.messageContainer}>
-            <Stack space="large">
+            <Stack space="xlarge">
               {displayMessages
                 .filter(
                   (msg, index) =>
@@ -443,181 +442,99 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                 )
                 .map((msg, index) => {
                   const { message, ...rest } = parseResponse(msg.content) ?? {};
-
                   const jsxVariations = Object.values(rest);
-
-                  const hasPreviewCode = jsxVariations.length > 0;
+                  const isUserMessage = msg.role === 'user';
 
                   return (
                     <Stack space="medium" key={msg.id}>
                       <Box
-                        className={classNames([
-                          styles.message,
-                          msg.role === 'user'
-                            ? styles.userMessage
-                            : styles.assistantMessage,
-
-                          displayMessages[index - 1]?.role === msg.role
-                            ? styles.groupMessageBlock
-                            : undefined,
-                        ])}
+                        className={{
+                          [styles.message]: true,
+                          [styles.assistantMessage]: !isUserMessage,
+                          [styles.userMessage]: isUserMessage,
+                          [styles.userMessageBlock]:
+                            isUserMessage &&
+                            messages[index - 1]?.role === msg.role,
+                        }}
                       >
-                        {message ? (
+                        <Stack space="small">
                           <Text>
-                            <span style={{ lineHeight: '1.5em' }}>
-                              {message}
+                            <span className={styles.messageContent}>
+                              {message || msg.content}
+                              {!isUserMessage ? <>&nbsp;</> : null}
                             </span>
-                          </Text>
-                        ) : (
-                          <>
-                            <Text>
-                              <span style={{ lineHeight: '1.5em' }}>
-                                {msg.content}
+                            {!isUserMessage ? (
+                              <span className={styles.readMessage}>
+                                <Button
+                                  aria-label="Listen to assistant"
+                                  title="Listen to assistant"
+                                  variant="transparent"
+                                  onClick={() => {
+                                    if (speechRef.current) {
+                                      speakThis(
+                                        message || msg.content,
+                                        speechRef.current
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <SpeakerIcon size={16} />
+                                </Button>
                               </span>
-                            </Text>
-                            {msg.experimental_attachments?.[0] ? (
-                              <Box
-                                paddingTop="small"
-                                className={styles.imageAttachment}
-                              >
-                                <img
-                                  src={msg.experimental_attachments[0].url}
-                                  className={styles.attachmentImage}
-                                  alt="Uploaded"
-                                />
-                              </Box>
                             ) : null}
-                          </>
-                        )}
+                          </Text>
+                          {msg.experimental_attachments?.[0] ? (
+                            <Box className={styles.imageAttachment}>
+                              <img
+                                src={msg.experimental_attachments[0].url}
+                                className={styles.attachmentImage}
+                                alt="Uploaded image"
+                              />
+                            </Box>
+                          ) : null}
+                        </Stack>
                       </Box>
-                      {hasPreviewCode ? (
-                        <Inline space="medium" alignY="center">
-                          {msg.id === previewId && jsxVariations.length > 1 ? (
-                            <>
-                              <Button
-                                aria-label="Previous suggestion"
-                                title="Previous suggestion"
-                                variant="transparent"
-                                disabled={suggestionIndex === 0}
-                                onClick={() => {
-                                  const newIndex = suggestionIndex - 1;
-                                  setSuggestionIndex(newIndex);
-                                  dispatch({
-                                    type: 'previewSuggestion',
-                                    payload: {
-                                      code: jsxVariations[newIndex],
-                                    },
-                                  });
-                                }}
-                              >
-                                <ChevronIcon direction="left" size={16} />
-                              </Button>
-                              <Text size="small">{`${suggestionIndex + 1} of ${
-                                jsxVariations.length
-                              }`}</Text>
-                              <Button
-                                aria-label="Next suggestion"
-                                title="Next suggestion"
-                                variant="transparent"
-                                disabled={
-                                  suggestionIndex === jsxVariations.length - 1
-                                }
-                                onClick={() => {
-                                  const newIndex = suggestionIndex + 1;
-                                  setSuggestionIndex(newIndex);
-                                  dispatch({
-                                    type: 'previewSuggestion',
-                                    payload: {
-                                      code: jsxVariations[newIndex],
-                                    },
-                                  });
-                                }}
-                              >
-                                <ChevronIcon direction="right" size={16} />
-                              </Button>
-                            </>
-                          ) : null}
-                          {msg.id !== previewId ? (
-                            <Button
-                              aria-label="Preview suggestion"
-                              title="Preview suggestion"
-                              variant="transparent"
-                              onClick={() => {
-                                setPreviewId(msg.id);
-                                setSuggestionIndex(0);
-                                dispatch({
-                                  type: 'previewSuggestion',
-                                  payload: {
-                                    code: jsxVariations[0],
-                                  },
-                                });
-                              }}
-                            >
-                              <PlayIcon size={16} />
-                            </Button>
-                          ) : null}
-                          <Button
-                            aria-label={copying ? 'Copied' : 'Copy code'}
-                            title={copying ? 'Copied' : 'Copy code'}
-                            variant="transparent"
-                            tone={copying ? 'positive' : undefined}
-                            onClick={() =>
-                              copyClick(jsxVariations[suggestionIndex])
-                            }
-                          >
-                            {copying ? (
-                              <TickIcon size={16} />
-                            ) : (
-                              <CopyIcon size={16} />
-                            )}
-                          </Button>
-                          <Button
-                            aria-label="Apply code"
-                            title="Apply code"
-                            variant="transparent"
-                            onClick={() => {
-                              setSuggestionIndex(0);
-                              setPreviewId('');
-                              dispatch({
-                                type: 'updateCode',
-                                payload: {
-                                  code: jsxVariations[suggestionIndex],
-                                },
-                              });
-                            }}
-                          >
-                            <AddIcon size={16} />
-                          </Button>
-                          {message ? (
-                            <Button
-                              aria-label="Listen to assistant"
-                              title="Listen to assistant"
-                              variant="transparent"
-                              onClick={() => {
-                                if (speechRef.current) {
-                                  speakThis(message, speechRef.current);
-                                }
-                              }}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="currentcolor"
-                                height="16"
-                                width="16"
-                                viewBox="0 0 489.6 489.6"
-                              >
-                                <path d="M361.1,337.6c2.2,1.5,4.6,2.3,7.1,2.3c3.8,0,7.6-1.8,10-5.2c18.7-26.3,28.5-57.4,28.5-89.9s-9.9-63.6-28.5-89.9    c-3.9-5.5-11.6-6.8-17.1-2.9c-5.5,3.9-6.8,11.6-2.9,17.1c15.7,22.1,24,48.3,24,75.8c0,27.4-8.3,53.6-24,75.8    C354.3,326.1,355.6,333.7,361.1,337.6z" />
-                                <path d="M425.4,396.3c2.2,1.5,4.6,2.3,7.1,2.3c3.8,0,7.6-1.8,10-5.2c30.8-43.4,47.1-94.8,47.1-148.6s-16.3-105.1-47.1-148.6    c-3.9-5.5-11.6-6.8-17.1-2.9c-5.5,3.9-6.8,11.6-2.9,17.1c27.9,39.3,42.6,85.7,42.6,134.4c0,48.6-14.7,95.1-42.6,134.4    C418.6,384.7,419.9,392.3,425.4,396.3z" />
-                                <path d="M254.7,415.7c4.3,2.5,9.2,3.8,14.2,3.8l0,0c7.4,0,14.4-2.8,19.7-7.9c5.6-5.4,8.7-12.6,8.7-20.4V98.5    c0-15.7-12.7-28.4-28.4-28.4c-4.9,0-9.8,1.3-14.2,3.8c-0.3,0.2-0.6,0.3-0.8,0.5l-100.1,69.2H73.3C32.9,143.6,0,176.5,0,216.9v55.6    c0,40.4,32.9,73.3,73.3,73.3h84.5l95.9,69.2C254,415.3,254.4,415.5,254.7,415.7z M161.8,321.3H73.3c-26.9,0-48.8-21.9-48.8-48.8    v-55.6c0-26.9,21.9-48.8,48.8-48.8h84.3c2.5,0,4.9-0.8,7-2.2l102.7-71c0.5-0.3,1.1-0.4,1.6-0.4c1.6,0,3.9,1.2,3.9,3.9v292.7    c0,1.1-0.4,2-1.1,2.8c-0.7,0.7-1.8,1.1-2.7,1.1c-0.5,0-1-0.1-1.5-0.3l-98.4-71.1C166.9,322.1,164.4,321.3,161.8,321.3z" />
-                              </svg>
-                            </Button>
-                          ) : null}
-                        </Inline>
-                      ) : null}
+
+                      {jsxVariations.map((variant, variantIndex) => (
+                        <AISnippet
+                          key={index}
+                          snippet={variant}
+                          active={
+                            msg.id === previewId &&
+                            suggestionIndex === variantIndex
+                          }
+                          label={
+                            jsxVariations.length > 1
+                              ? `View ${variantIndex + 1}`
+                              : 'View'
+                          }
+                          onApply={() => {
+                            setSuggestionIndex(variantIndex);
+                            setPreviewId('');
+                            dispatch({
+                              type: 'updateCode',
+                              payload: {
+                                code: variant,
+                              },
+                            });
+                          }}
+                          onSelect={() => {
+                            setPreviewId(msg.id);
+                            setSuggestionIndex(variantIndex);
+                            dispatch({
+                              type: 'previewSuggestion',
+                              payload: {
+                                code: variant,
+                              },
+                            });
+                          }}
+                        />
+                      ))}
                     </Stack>
                   );
                 })}
             </Stack>
+
             {loading ? <Text>{loadingMessage}</Text> : null}
 
             {hasError ? (
@@ -717,18 +634,7 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                         ref={fileInputRef}
                         accept="image/*"
                       />
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        xmlSpace="preserve"
-                        focusable="false"
-                        fill="currentColor"
-                        width={20}
-                        height={20}
-                      >
-                        <path d="M19 2H5C3.3 2 2 3.3 2 5v14c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3V5c0-1.7-1.3-3-3-3zM4 5c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v7.6L17.4 10c-.8-.8-2.1-.8-2.8 0l-9.9 9.9c-.4-.1-.7-.5-.7-.9V5zm15 15H7.4l8.6-8.6 4 4V19c0 .6-.4 1-1 1z" />
-                        <circle cx={8} cy={8} r={2} />
-                      </svg>
+                      <ImageIcon />
                     </Button>
                   </Inline>
 
@@ -758,38 +664,9 @@ Generate and return only 1 unless specifically asked to generate multiple versio
                       }
                     >
                       {loading ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 100 100"
-                          preserveAspectRatio="xMidYMid"
-                          width="20"
-                          height="20"
-                          fill="none"
-                          className={styles.loader}
-                        >
-                          <circle
-                            strokeLinecap="round"
-                            strokeDasharray="70"
-                            stroke="currentcolor"
-                            strokeWidth="8"
-                            r="46"
-                            cy="50"
-                            cx="50"
-                          />
-                        </svg>
+                        <LoadingIcon size={20} />
                       ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          xmlSpace="preserve"
-                          focusable="false"
-                          fill="currentColor"
-                          width={20}
-                          height={20}
-                          opacity={input.trim().length === 0 ? 0.6 : undefined}
-                        >
-                          <path d="M22 3c0-.1 0-.2-.1-.3v-.1c0-.1-.1-.2-.2-.3-.1-.1-.2-.1-.3-.2h-.1c-.1-.1-.2-.1-.3-.1h-.3l-19 6c-.4.2-.6.5-.7.9 0 .4.1.8.5 1l7.8 4.9 4.9 7.8c.2.3.5.5.8.5h.1c.4 0 .7-.3.8-.7l6-19c.1-.2.1-.3.1-.4zm-4.6 2.2-7.5 7.5-5.5-3.4 13-4.1zm-2.7 14.4-3.4-5.5 7.5-7.5-4.1 13z" />
-                        </svg>
+                        <SendIcon size={20} dim={input.trim().length === 0} />
                       )}
                     </Button>
                   </Inline>

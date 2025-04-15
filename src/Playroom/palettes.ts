@@ -187,7 +187,7 @@ export const dark = {
     neutral: seekPalette.grey[800],
     surface: seekPalette.grey[900],
     body: darken(0.03, seekPalette.grey[900]),
-    selection: transparentize(0.75, seekPalette.blue[600]),
+    selection: transparentize(0.8, seekPalette.blue[600]),
     search: transparentize(0.25, seekPalette.blue[600]),
   },
   border: {
