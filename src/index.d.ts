@@ -1,9 +1,3 @@
-export interface AIExample {
-  name: string;
-  code: string;
-  description?: string;
-}
-
 interface PlayroomConfig {
   components: string;
   outputPath: string;
@@ -24,9 +18,6 @@ interface PlayroomConfig {
   reactDocgenTypescriptConfig?: import('react-docgen-typescript').ParserOptions;
   defaultVisibleThemes?: string[];
   defaultVisibleWidths?: number[];
-  ai?: {
-    examples?: AIExample[] | string; // Can be an array of examples or path to a file
-  };
 }
 
 interface InternalPlayroomConfig extends PlayroomConfig {

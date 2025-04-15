@@ -222,27 +222,6 @@ ${code}
 5. If the user asks for a component you don't have, use the closest available alternative.
 6. MUST follow snippets examples and syntax. For example, if a component is nested in a provider, you must always add the provider.
 
-${
-  state.aiExamples && state.aiExamples.length > 0
-    ? `
-## Example usage
-
-Here are some example components that demonstrate best practices:
-
-${state.aiExamples
-  .map(
-    ({ name, code, description }) =>
-      `### ${name}${description ? ` - ${description}` : ''}
-\`\`\`jsx
-${code}
-\`\`\`
-`
-  )
-  .join('\n')}
-`
-    : ''
-}
-
 ## Response Format (VERY IMPORTANT)
 
 Return a JSON object in the following format:

@@ -96,11 +96,6 @@ interface State {
   visibleWidths?: PlayroomProps['widths'];
   ready: boolean;
   colorScheme: ColorScheme;
-  aiExamples?: Array<{
-    name: string;
-    code: string;
-    description?: string;
-  }>;
 }
 
 type Action =
@@ -468,7 +463,6 @@ const initialState: State = {
   editorWidth: defaultEditorSize,
   ready: false,
   colorScheme: 'system',
-  aiExamples: playroomConfig.ai?.examples as State['aiExamples'],
 };
 
 export const StoreContext = createContext<StoreContextValues>([
