@@ -304,6 +304,10 @@ Generate and return only 1 unless specifically asked to generate multiple versio
     });
   };
 
+  const resetPreviewVariant = () => {
+    setActiveSuggestion(null);
+  };
+
   return (
     <AssistantContext.Provider
       value={{
@@ -336,6 +340,7 @@ Generate and return only 1 unless specifically asked to generate multiple versio
         setImageDataUrl,
         applyVariant,
         previewVariant,
+        resetPreviewVariant,
       }}
     >
       {children}
@@ -369,6 +374,7 @@ export type AssistantContextValue = Pick<
     id: string;
     variantIndex: number;
   }) => void;
+  resetPreviewVariant: () => void;
 };
 
 export const AssistantContext = createContext<AssistantContextValue | null>(

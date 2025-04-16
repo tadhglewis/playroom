@@ -110,7 +110,15 @@ export const ChatForm = () => {
   };
 
   return (
-    <Box component="form" onSubmit={onSubmit}>
+    <Box
+      component="form"
+      onSubmit={onSubmit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          onSubmit(e);
+        }
+      }}
+    >
       <Box className={styles.fieldContainer}>
         {imageDataUrl ? (
           <Box paddingX="large" paddingTop="xxxlarge">
@@ -143,29 +151,31 @@ export const ChatForm = () => {
           />
           <Box className={styles.focusIndicator} />
           <Box paddingX="medium">
-            <input
-              type="file"
-              id="image-upload"
-              className={styles.imageInput}
-              ref={fileInputRef}
-              accept="image/*"
-            />
             <Spread space="small">
               <Inline space="small" nowrap>
-                <Button
-                  as="label"
-                  htmlFor="image-upload"
-                  aria-label="Upload Image"
-                  title="Upload Image"
-                  variant="transparent"
-                  onKeyUp={(ev: KeyboardEvent<HTMLElement>) => {
-                    if (ev.key === 'Enter') {
-                      fileInputRef.current?.click();
-                    }
-                  }}
-                >
-                  <ImageIcon />
-                </Button>
+                <Box position="relative">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    className={styles.imageInput}
+                    ref={fileInputRef}
+                    accept="image/*"
+                  />
+                  <Button
+                    as="label"
+                    htmlFor="image-upload"
+                    aria-label="Upload Image"
+                    title="Upload Image"
+                    variant="transparent"
+                    onKeyUp={(ev: KeyboardEvent<HTMLElement>) => {
+                      if (ev.key === 'Enter') {
+                        fileInputRef.current?.click();
+                      }
+                    }}
+                  >
+                    <ImageIcon />
+                  </Button>
+                </Box>
               </Inline>
 
               <Inline space="small" nowrap>

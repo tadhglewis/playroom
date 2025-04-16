@@ -138,7 +138,7 @@ export default ({ themes: allThemes, widths: allWidths, snippets }: Props) => {
 
             <ToolbarItem
               active={isAIOpen}
-              title="AI Assistant"
+              title="Assistant"
               onClick={() => {
                 dispatch({
                   type: 'toggleToolbar',

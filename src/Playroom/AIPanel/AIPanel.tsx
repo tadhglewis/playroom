@@ -10,6 +10,7 @@ import { AISnippet } from './AISnippet';
 import { useAssistant } from '../AssistantProvider/AssistantProvider';
 import { ChatMessage } from './ChatMessage';
 import { ChatForm } from './ChatForm';
+import AIIcon from '../icons/AIIcon';
 
 import * as styles from './AIPanel.css';
 
@@ -38,6 +39,7 @@ export default () => {
     loading,
     applyVariant,
     previewVariant,
+    resetPreviewVariant,
   } = useAssistant();
 
   useEffect(() => {
@@ -60,12 +62,18 @@ export default () => {
     el?.scrollTo(0, el.scrollHeight);
   }, [messages.length, loading, hasError]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => resetPreviewVariant, []);
+
   return (
     <Box component="aside" className={styles.root}>
       <Box position="absolute" inset={0} display="flex" flexDirection="column">
         <Box padding="xxlarge">
           <Spread space="small" alignY="center">
-            <Heading level="3">AI Assistant</Heading>
+            <Heading level="3">
+              Assistant{' '}
+              <AIIcon height={20} width={20} style={{ margin: '-4px 2px' }} />
+            </Heading>
             {messages.length > 1 && (
               <TextLinkButton onClick={reset}>Reset</TextLinkButton>
             )}
