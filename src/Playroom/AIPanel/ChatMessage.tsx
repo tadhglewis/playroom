@@ -11,10 +11,11 @@ import * as styles from './ChatMessage.css';
 
 const speakThis = (str: string, synth: typeof window.speechSynthesis) => {
   const voices = synth.getVoices();
+  const preferredVoice = voices.filter((voice) => voice.name === 'Karen');
   const utterThis = new SpeechSynthesisUtterance(str);
-  utterThis.voice = voices[0];
-  utterThis.pitch = 1; // Eg. min="0" max="2" value="1" step="0.1"
-  utterThis.rate = 1.4; // Eg. min="0.5" max="2" value="1" step="0.1"
+  utterThis.voice = preferredVoice[0] || undefined;
+  utterThis.pitch = 1;
+  utterThis.rate = 1.1;
   synth.speak(utterThis);
 };
 
