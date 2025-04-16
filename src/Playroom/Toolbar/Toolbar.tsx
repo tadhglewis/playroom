@@ -24,17 +24,11 @@ interface Props {
   themes: PlayroomProps['themes'];
   widths: PlayroomProps['widths'];
   snippets: PlayroomProps['snippets'];
-  components: PlayroomProps['components'];
 }
 
 const ANIMATION_TIMEOUT = 300;
 
-export default ({
-  themes: allThemes,
-  widths: allWidths,
-  snippets,
-  components,
-}: Props) => {
+export default ({ themes: allThemes, widths: allWidths, snippets }: Props) => {
   const [
     {
       visibleThemes = [],
@@ -224,9 +218,7 @@ export default ({
 
             {lastActivePanel === 'settings' && <SettingsPanel />}
 
-            {lastActivePanel === 'ai' && (
-              <AIPanel snippets={snippets} components={components} />
-            )}
+            {lastActivePanel === 'ai' && <AIPanel />}
           </div>
         </CSSTransition>
       </div>

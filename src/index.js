@@ -1,6 +1,7 @@
 import { renderElement } from './render';
 import Playroom from './Playroom/Playroom';
 import { StoreProvider } from './StoreContext/StoreContext';
+import { AssistantProvider } from './Playroom/AssistantProvider/AssistantProvider';
 import playroomConfig from './config';
 import faviconPath from '../images/favicon.png';
 import faviconInvertedPath from '../images/favicon-inverted.png';
@@ -32,16 +33,19 @@ const renderPlayroom = ({
     Object.entries(components).filter(([_, value]) => value)
   );
 
+  const resolvedSnippets =
+    typeof snippets.default !== 'undefined' ? snippets.default : snippets;
+
   renderElement(
     <StoreProvider themes={themeNames} widths={widths}>
-      <Playroom
-        components={filteredComponents}
-        widths={widths}
-        themes={themeNames}
-        snippets={
-          typeof snippets.default !== 'undefined' ? snippets.default : snippets
-        }
-      />
+      <AssistantProvider components={components} snippets={resolvedSnippets}>
+        <Playroom
+          components={filteredComponents}
+          widths={widths}
+          themes={themeNames}
+          snippets={resolvedSnippets}
+        />
+      </AssistantProvider>
     </StoreProvider>,
     outlet
   );
