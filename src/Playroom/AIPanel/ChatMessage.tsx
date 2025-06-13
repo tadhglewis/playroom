@@ -11,11 +11,22 @@ import * as styles from './ChatMessage.css';
 
 const speakThis = (str: string, synth: typeof window.speechSynthesis) => {
   const voices = synth.getVoices();
-  const preferredVoice = voices.filter((voice) => voice.name === 'Karen');
+  const voicesByName = voices.reduce(
+    (acc, v) => ({
+      ...acc,
+      [v.name]: v,
+    }),
+    {} as Record<string, (typeof voices)[number]>
+  );
+  const preferredVoice =
+    voicesByName['Google UK English Female'] ||
+    voicesByName.Moira ||
+    voicesByName.Karen ||
+    undefined;
   const utterThis = new SpeechSynthesisUtterance(str);
-  utterThis.voice = preferredVoice[0] || undefined;
+  utterThis.voice = preferredVoice;
   utterThis.pitch = 1;
-  utterThis.rate = 1.1;
+  utterThis.rate = 1;
   synth.speak(utterThis);
 };
 
