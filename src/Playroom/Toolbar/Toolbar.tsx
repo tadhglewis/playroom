@@ -1,32 +1,31 @@
+import clsx from 'clsx';
 import { useContext, useState, useCallback, useEffect, useRef } from 'react';
-import classnames from 'classnames';
-import type { PlayroomProps } from '../Playroom';
+import { CSSTransition } from 'react-transition-group';
+
 import { StoreContext } from '../../StoreContext/StoreContext';
-import FramesPanel from '../FramesPanel/FramesPanel';
-import PreviewPanel from '../PreviewPanel/PreviewPanel';
-import Snippets from '../Snippets/Snippets';
+import { isMac } from '../../utils/formatting';
 import AIPanel from '../AIPanel/AIPanel';
+import FramesPanel from '../FramesPanel/FramesPanel';
+import type { PlayroomProps } from '../Playroom';
+import PreviewPanel from '../PreviewPanel/PreviewPanel';
+import SettingsPanel from '../SettingsPanel/SettingsPanel';
+import Snippets from '../Snippets/Snippets';
 import ToolbarItem from '../ToolbarItem/ToolbarItem';
+import { ANIMATION_TIMEOUT } from '../constants';
+import AIIcon from '../icons/AIIcon';
 import AddIcon from '../icons/AddIcon';
 import FramesIcon from '../icons/FramesIcon';
-import ShareIcon from '../icons/ShareIcon';
 import PlayIcon from '../icons/PlayIcon';
-import AIIcon from '../icons/AIIcon';
+import SettingsIcon from '../icons/SettingsIcon';
+import ShareIcon from '../icons/ShareIcon';
 
 import * as styles from './Toolbar.css';
-import SettingsPanel from '../SettingsPanel/SettingsPanel';
-import SettingsIcon from '../icons/SettingsIcon';
-import { isMac } from '../../utils/formatting';
-
-import { CSSTransition } from 'react-transition-group';
 
 interface Props {
   themes: PlayroomProps['themes'];
   widths: PlayroomProps['widths'];
   snippets: PlayroomProps['snippets'];
 }
-
-const ANIMATION_TIMEOUT = 300;
 
 export default ({ themes: allThemes, widths: allWidths, snippets }: Props) => {
   const [
@@ -80,7 +79,7 @@ export default ({ themes: allThemes, widths: allWidths, snippets }: Props) => {
 
   return (
     <div
-      className={classnames(styles.root, {
+      className={clsx(styles.root, {
         [styles.isOpen]: isOpen,
       })}
     >

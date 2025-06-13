@@ -1,4 +1,5 @@
 import type { AllHTMLAttributes } from 'react';
+
 import { Box } from '../Box/Box';
 import DismissIcon from '../icons/DismissIcon';
 

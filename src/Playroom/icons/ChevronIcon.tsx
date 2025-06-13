@@ -1,5 +1,5 @@
+import clsx from 'clsx';
 import type { SVGProps } from 'react';
-import classnames from 'classnames';
 
 import * as styles from './ChevronIcon.css';
 
@@ -19,7 +19,7 @@ export default ({
     viewBox="0 0 24 24"
     focusable="false"
     fill="currentColor"
-    className={classnames(styles.root, {
+    className={clsx(styles.root, {
       [styles.up]: direction === 'up',
       [styles.left]: direction === 'left',
       [styles.right]: direction === 'right',

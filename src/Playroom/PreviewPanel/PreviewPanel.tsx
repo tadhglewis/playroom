@@ -1,16 +1,17 @@
 import { useState } from 'react';
 
-import usePreviewUrl from '../../utils/usePreviewUrl';
-import { ThemeSelector } from './ThemeSelector';
-import { Heading } from '../Heading/Heading';
-import { ToolbarPanel } from '../ToolbarPanel/ToolbarPanel';
-import { Stack } from '../Stack/Stack';
-import { Inline } from '../Inline/Inline';
-import PlayIcon from '../icons/PlayIcon';
-import { Button } from '../Button/Button';
 import { useCopy } from '../../utils/useCopy';
-import TickIcon from '../icons/TickIcon';
+import usePreviewUrl from '../../utils/usePreviewUrl';
+import { Button } from '../Button/Button';
+import { Heading } from '../Heading/Heading';
+import { Inline } from '../Inline/Inline';
+import { Stack } from '../Stack/Stack';
+import { ToolbarPanel } from '../ToolbarPanel/ToolbarPanel';
+import PlayIcon from '../icons/PlayIcon';
 import ShareIcon from '../icons/ShareIcon';
+import TickIcon from '../icons/TickIcon';
+
+import { ThemeSelector } from './ThemeSelector';
 
 interface PreviewPanelProps {
   themes: string[];

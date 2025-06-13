@@ -1,5 +1,5 @@
+import clsx from 'clsx';
 import type { ReactElement } from 'react';
-import classnames from 'classnames';
 
 import * as styles from './Stack.css';
 
@@ -17,7 +17,5 @@ interface Props {
 }
 
 export const Stack = ({ children, space }: Props) => (
-  <div className={classnames(styles.gap, styles.spaceScale[space])}>
-    {children}
-  </div>
+  <div className={clsx(styles.gap, styles.spaceScale[space])}>{children}</div>
 );

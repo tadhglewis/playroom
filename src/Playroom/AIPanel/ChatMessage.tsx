@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
+
 import type { AssistantContextValue } from '../AssistantProvider/AssistantProvider';
 import { Box } from '../Box/Box';
 import { Button } from '../Button/Button';
-import SpeakerIcon from '../icons/SpeakerIcon';
 import { Stack } from '../Stack/Stack';
 import { Text } from '../Text/Text';
+import SpeakerIcon from '../icons/SpeakerIcon';
+
 import { ImageAttachmentPreview } from './ImageAttachmentPreview';
 
 import * as styles from './ChatMessage.css';

@@ -1,5 +1,5 @@
+import clsx from 'clsx';
 import type { ElementType, AllHTMLAttributes, ReactElement } from 'react';
-import classnames from 'classnames';
 
 import * as styles from './Button.css';
 
@@ -30,7 +30,7 @@ export const Button = ({
   ...props
 }: Props) => (
   <ButtonComponent
-    className={classnames(
+    className={clsx(
       styles.reset,
       styles.base,
       styles.variants[variant!],

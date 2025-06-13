@@ -1,12 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import classnames from 'classnames';
-import fuzzy from 'fuzzy';
+import clsx from 'clsx';
+import Fuse from 'fuse.js';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import type { PlayroomProps } from '../Playroom';
+
 import type { Snippet } from '../../../utils';
-import SearchField from './SearchField/SearchField';
-import { Text } from '../Text/Text';
+import type { PlayroomProps } from '../Playroom';
 import { Stack } from '../Stack/Stack';
+import { Text } from '../Text/Text';
+
+import SearchField from './SearchField/SearchField';
 
 import * as styles from './Snippets.css';
 
@@ -25,26 +27,44 @@ function getSnippetId(snippet: Snippet, index: number) {
   return `${snippet.group}_${snippet.name}_${index}`;
 }
 
-const filterSnippetsForTerm = (snippets: Props['snippets'], term: string) =>
-  term
-    ? fuzzy
-        .filter(term, snippets, {
-          extract: (snippet) => `${snippet.group} ${snippet.name}`,
-        })
-        .map(({ original, score }) => ({ ...original, score }))
-    : snippets;
+const options = {
+  threshold: 0.3,
+  keys: [
+    {
+      name: 'group',
+      weight: 2,
+    },
+    {
+      name: 'name',
+      weight: 1,
+    },
+  ],
+};
 
 export default ({ isOpen, snippets, onHighlight, onClose }: Props) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [highlightedIndex, setHighlightedIndex] =
     useState<HighlightIndex>(null);
+
   const listEl = useRef<HTMLUListElement | null>(null);
   const highlightedEl = useRef<HTMLLIElement | null>(null);
+
+  const fuse = useMemo(() => new Fuse(snippets, options), [snippets]);
+
+  const filteredSnippets = useMemo(
+    () =>
+      searchTerm
+        ? fuse.search(searchTerm).map((result) => result.item)
+        : snippets,
+    [fuse, searchTerm, snippets]
+  );
+
   const closeHandler = (returnValue: ReturnedSnippet) => {
     if (typeof onClose === 'function') {
       onClose(returnValue);
     }
   };
+
   const debouncedPreview = useDebouncedCallback(
     (previewSnippet: ReturnedSnippet) => {
       if (typeof onHighlight === 'function') {
@@ -52,11 +72,6 @@ export default ({ isOpen, snippets, onHighlight, onClose }: Props) => {
       }
     },
     50
-  );
-
-  const filteredSnippets = useMemo(
-    () => filterSnippetsForTerm(snippets, searchTerm),
-    [searchTerm, snippets]
   );
 
   if (
@@ -139,7 +154,7 @@ export default ({ isOpen, snippets, onHighlight, onClose }: Props) => {
               ref={isHighlighted ? highlightedEl : undefined}
               id={getSnippetId(snippet, index)}
               key={`${snippet.group}_${snippet.name}_${index}`}
-              className={classnames(styles.snippet, {
+              className={clsx(styles.snippet, {
                 [styles.highlight]: isHighlighted,
               })}
               onMouseMove={

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+
 import { Button, type ButtonProps } from '../Button/Button';
 
 type Props = Omit<ButtonProps, 'onClick'> & {

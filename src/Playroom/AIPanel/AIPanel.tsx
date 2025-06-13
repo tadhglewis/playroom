@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+
+import { useAssistant } from '../AssistantProvider/AssistantProvider';
+import { Box } from '../Box/Box';
 import { Heading } from '../Heading/Heading';
+import { ScrollContainer } from '../ScrollContainer/ScrollContainer';
+import { Spread } from '../Spread/Spread';
 import { Stack } from '../Stack/Stack';
 import { Text } from '../Text/Text';
-import { Box } from '../Box/Box';
 import { TextLinkButton } from '../TextLinkButton/TextLinkButton';
-import { Spread } from '../Spread/Spread';
-import { ScrollContainer } from '../ScrollContainer/ScrollContainer';
-import { AISnippet } from './AISnippet';
-import { useAssistant } from '../AssistantProvider/AssistantProvider';
-import { ChatMessage } from './ChatMessage';
-import { ChatForm } from './ChatForm';
 import AIIcon from '../icons/AIIcon';
+
+import { AISnippet } from './AISnippet';
+import { ChatForm } from './ChatForm';
+import { ChatMessage } from './ChatMessage';
 
 import * as styles from './AIPanel.css';
 

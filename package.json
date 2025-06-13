@@ -1,11 +1,19 @@
 {
   "name": "playroom",
-  "version": "0.42.0",
+  "version": "0.44.0",
   "description": "Design with code, powered by your own component library",
-  "main": "utils/index.js",
-  "types": "utils/index.d.ts",
   "bin": {
     "playroom": "bin/cli.cjs"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "CHANGELOG.md",
@@ -13,7 +21,8 @@
     "images",
     "lib",
     "src",
-    "utils"
+    "utils",
+    "dist"
   ],
   "scripts": {
     "cypress": "start-server-and-test build-and-serve:all '9000|9001|9002' 'cypress run'",
@@ -38,13 +47,15 @@
     "lint:prettier": "prettier --list-different '**/*.{js,md,ts,tsx}'",
     "lint:tsc": "tsc --noEmit",
     "lint:cypress": "tsc --project cypress/tsconfig.json",
-    "format": "prettier --write '**/*.{js,md,ts,tsx}'",
+    "format": "pnpm lint:eslint --fix && prettier --write '**/*.{js,md,ts,tsx}'",
     "version": "changeset version",
-    "release": "changeset publish",
+    "release": "pnpm package && changeset publish",
+    "package": "tsdown",
     "test": "jest src lib",
     "post-commit-status": "node scripts/postCommitStatus.js",
     "deploy-preview": "surge -p ./cypress/projects/themed/dist",
-    "prepare": "husky"
+    "prepare": "husky",
+    "changeset": "changeset"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
@@ -84,7 +95,6 @@
     "@vanilla-extract/sprinkles": "^1.5.1",
     "@vanilla-extract/webpack-plugin": "^2.3.6",
     "babel-loader": "^9.1.0",
-    "classnames": "^2.3.2",
     "clsx": "^2.1.1",
     "codemirror": "^5.65.10",
     "command-line-args": "^5.2.1",
@@ -93,7 +103,7 @@
     "css-loader": "^6.7.2",
     "dedent": "^1.5.1",
     "find-up": "^5.0.0",
-    "fuzzy": "^0.1.3",
+    "fuse.js": "^7.1.0",
     "history": "^5.3.0",
     "html-webpack-plugin": "^5.5.0",
     "localforage": "^1.10.0",
@@ -106,6 +116,7 @@
     "prop-types": "^15.8.1",
     "re-resizable": "^6.11.2",
     "react-docgen-typescript": "^2.2.2",
+    "react-error-boundary": "^4.0.13",
     "react-helmet": "^6.1.0",
     "react-transition-group": "^4.4.5",
     "read-pkg-up": "^7.0.1",
@@ -128,6 +139,7 @@
     "@types/node": "^18.11.9",
     "@types/react-helmet": "^6.1.6",
     "@types/react-transition-group": "^4.4.10",
+    "@types/webpack-env": "^1.18.8",
     "concurrently": "^9.1.2",
     "cypress": "^13.6.6",
     "eslint": "^9.23.0",
@@ -139,7 +151,8 @@
     "react-dom": "^19.0.0",
     "serve": "^14.1.2",
     "start-server-and-test": "^2.0.11",
-    "surge": "^0.24.6"
+    "surge": "^0.24.6",
+    "tsdown": "^0.12.7"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

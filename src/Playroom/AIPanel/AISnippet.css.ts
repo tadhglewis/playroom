@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+
 import { colorPaletteVars, sprinkles } from '../sprinkles.css';
 
 export const suggestion = style([

@@ -1,3 +1,4 @@
+import { useChat, type Message } from '@ai-sdk/react';
 import {
   createContext,
   type Dispatch,
@@ -6,9 +7,9 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { PlayroomProps } from '../Playroom';
+
 import { StoreContext } from '../../StoreContext/StoreContext';
-import { useChat, type Message } from '@ai-sdk/react';
+import type { PlayroomProps } from '../Playroom';
 
 interface Props {
   children: ReactNode;

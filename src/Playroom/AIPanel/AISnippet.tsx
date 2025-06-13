@@ -1,13 +1,12 @@
 import { useCopy } from '../../utils/useCopy';
-
 import { Box } from '../Box/Box';
 import { Button } from '../Button/Button';
-import CopyIcon from '../icons/CopyIcon';
-import TickIcon from '../icons/TickIcon';
 import { Inline } from '../Inline/Inline';
 import { Spread } from '../Spread/Spread';
 import { Stack } from '../Stack/Stack';
 import { Text } from '../Text/Text';
+import CopyIcon from '../icons/CopyIcon';
+import TickIcon from '../icons/TickIcon';
 
 import * as styles from './AISnippet.css';
 

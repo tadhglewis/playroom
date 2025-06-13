@@ -1,6 +1,8 @@
 import { style, globalStyle, keyframes } from '@vanilla-extract/css';
-import { dark } from '../palettes';
-import { sprinkles, colorPaletteVars } from '../sprinkles.css';
+
+import { dark } from '../../palettes';
+
+import { sprinkles, colorPaletteVars } from '../../sprinkles.css';
 
 export const animationDuration = 1300;
 export const animationDelay = 500;
@@ -17,7 +19,11 @@ export const root = style([
     transition: 'slow',
   }),
   {
-    zIndex: 100,
+    /**
+     * Attempt to elevate above portal'd elements that are
+     * attached to the `body` element.
+     */
+    zIndex: 99999,
     background: dark.background.neutral,
     color: colorPaletteVars.foreground.neutralInverted,
   },

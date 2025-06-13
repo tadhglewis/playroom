@@ -1,7 +1,8 @@
 import { style } from '@vanilla-extract/css';
+import { calc } from '@vanilla-extract/css-utils';
+
 import { sprinkles } from '../sprinkles.css';
 import { vars } from '../vars.css';
-import { calc } from '@vanilla-extract/css-utils';
 
 export const root = sprinkles({
   position: 'relative',

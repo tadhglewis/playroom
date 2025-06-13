@@ -4,6 +4,7 @@ import {
   styleVariants,
   globalStyle,
 } from '@vanilla-extract/css';
+
 import { vars } from '../vars.css';
 
 const size = createVar();

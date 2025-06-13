@@ -1,5 +1,5 @@
+import clsx from 'clsx';
 import type { ReactElement } from 'react';
-import classnames from 'classnames';
 
 import * as styles from './Inline.css';
 
@@ -20,7 +20,7 @@ interface Props {
 
 export const Inline = ({ children, space, alignY, nowrap = false }: Props) => (
   <div
-    className={classnames(
+    className={clsx(
       styles.gap,
       styles.spaceScale[space],
       alignY ? styles.horizontalAlignmentScale[alignY] : undefined,

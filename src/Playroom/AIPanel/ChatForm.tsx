@@ -5,21 +5,23 @@ import {
   type KeyboardEvent,
   useContext,
 } from 'react';
+
+import { StoreContext } from '../../StoreContext/StoreContext';
 import {
   type AssistantContextValue,
   useAssistant,
 } from '../AssistantProvider/AssistantProvider';
-import { StoreContext } from '../../StoreContext/StoreContext';
 import { Box } from '../Box/Box';
-import { Stack } from '../Stack/Stack';
-import { Spread } from '../Spread/Spread';
-import { Inline } from '../Inline/Inline';
 import { Button } from '../Button/Button';
+import { Inline } from '../Inline/Inline';
+import { Spread } from '../Spread/Spread';
+import { Stack } from '../Stack/Stack';
 import ImageIcon from '../icons/ImageIcon';
-import SendIcon from '../icons/SendIcon';
-import { TalkButton } from './TalkButton';
 import LoadingIcon from '../icons/LoadingIcon';
+import SendIcon from '../icons/SendIcon';
+
 import { ImageAttachmentPreview } from './ImageAttachmentPreview';
+import { TalkButton } from './TalkButton';
 
 import * as styles from './ChatForm.css';
 

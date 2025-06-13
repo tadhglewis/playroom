@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
-import { colorPaletteVars, sprinkles } from '../sprinkles.css';
 import { calc } from '@vanilla-extract/css-utils';
+
+import { colorPaletteVars, sprinkles } from '../sprinkles.css';
 import { vars } from '../vars.css';
 
 export const button = style([

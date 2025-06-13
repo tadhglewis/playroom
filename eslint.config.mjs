@@ -4,6 +4,33 @@ import eslintConfigSeek from 'eslint-config-seek';
 export default defineConfig([
   ...eslintConfigSeek,
   {
+    rules: {
+      'import-x/order': [
+        'error',
+        {
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc' },
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          pathGroups: [
+            {
+              pattern: '*.css',
+              group: 'index',
+              position: 'after',
+              patternOptions: { matchBase: true },
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['bin/**/*.cjs', 'lib/**/*.js'],
     rules: {
       'no-console': 0,
