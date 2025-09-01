@@ -1,29 +1,3 @@
-## TEMP workflow
-
-```bash
-# Clone repositories
-echo "Cloning repositories..."
-mkdir playroom-ai
-cd playroom-ai
-gh repo clone https://github.com/tadhglewis/playroom
-gh repo clone https://github.com/SEEK-oss/braid-design-system
-
-echo "Setting up Braid with your Playroom fork..."
-cd braid-design-system/site
-# edit package.json to `"playroom": "link:../../playroom",`
-pnpm install
-cd ..
-# you may need to `cd playroom` and run `pnpm package`
-
-echo "Setup complete! Your forked Playroom is now linked to Braid."
-
-pnpm run build:site
-awsauth --app unified --filter seek-indirect-platform-dev --role sso-privileged
-aws s3 sync "site/dist/playroom" "s3://indie-turtle.ssod.skinfra.xyz"
-
-# Ensure playroom/src/Playroom/AssistantProvider/AssistantProvider.tsx `useChat` api points to prod and not localhost
-```
-
 <img src="images/logo.png?raw=true#gh-light-mode-only" alt="Playroom" title="Playroom" width="292" height="50" />
 <img src="images/logo-inverted.png?raw=true#gh-dark-mode-only" alt="Playroom" title="Playroom" width="292" height="50" />
 
